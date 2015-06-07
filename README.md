@@ -42,7 +42,9 @@ print(put_this) # 200
 
 There are four methods for retrieving data with Pyrebase: all, sort_by, sort_by_first, and sort_by_last.
 
-#### all
+#### Simple Queries
+
+##### all
 
 All takes a child and an optional callback function, returning all unsorted data under the child.
 
@@ -53,7 +55,7 @@ def my_callback():
 gimme_all = ref.all("users", my_callback())
 ```
 
-#### sort_by
+##### sort_by
 
 Sort_by takes a child, category, and optional callback function, returning data sorted by category.
 
@@ -61,9 +63,9 @@ Sort_by takes a child, category, and optional callback function, returning data 
 my_users = ref.sort_by("users", "name", None)
 ```
 
-#### sort_by_first
+#### Complex Queries
 
-Sort_by_first allows for more complex queries.
+##### sort_by_first
 
 Sort_by_first takes a child, category, start_at, limit_to_first, and optional callback function.
 
@@ -79,9 +81,7 @@ sort_first = ref.sort_by_first("articles", "index", 5, 10, None)
 Here we search for data in "articles" and sort entries by "index". If we have 50 entries, with indexes incremented
 by 1 per entry, this query would start at the entry with an index of 5 and return 10 results from index 5-15.
 
-#### sort_by_last
-
-Sort_by_last allows for more complex queries.
+##### sort_by_last
 
 Sort_by_last takes a child, category, start_at, limit_to_last, and optional callback function.
 
