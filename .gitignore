@@ -1,0 +1,8 @@
+.DS_Store
+.idea
+Pyrebase.egg-info
+build
+dist
+test.py
+__pycache__
+
