@@ -56,7 +56,6 @@ class Firebase():
 
         request_object = request.get(request_ref, background_callback=callback).result()
         request_json = request_object.json()
-        print(request_json)
         if request_object.status_code != 200:
             raise ValueError(request_json)
 
