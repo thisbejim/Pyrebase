@@ -97,7 +97,7 @@ class Firebase():
         try:
             request_list = sorted(request_list, key=itemgetter(category))
         except TypeError:
-            raise TypeError("Firebase category data type doesn't match across all entities.")
+            raise TypeError("Data type doesn't match across entities.")
 
         return request_list
 

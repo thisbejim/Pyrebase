@@ -1,6 +1,6 @@
 # Pyrebase
 
-A simple python interface for the Firebase REST API.
+A simple python interface for the [Firebase REST API](https://www.firebase.com/docs/rest/guide/).
 
 ## Installation
 
@@ -96,3 +96,14 @@ sort_last = ref.sort_by_last("articles", "index", 30, 10, None)
 ```
 Here we search for data in "articles" and sort entries by "index". If we have 50 entries, with indexes incremented
 by 1 per entry, this query would start at the entry with an index of 30 and return 10 results from index 30-20.
+
+### Common Errors
+
+#### Index not defined
+
+Please make sure that the child categories you are querying have indexing
+[set up properly](https://www.firebase.com/docs/security/guide/indexing-data.html) on Firebase.
+
+#### Data type doesn't match across entities
+
+Categories you are querying don't match data type. Eg, name: 0 and name: "hello".
