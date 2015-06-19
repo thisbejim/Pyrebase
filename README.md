@@ -1,6 +1,6 @@
 # Pyrebase
 
-A simple python interface for the [Firebase REST API](https://www.firebase.com/docs/rest/guide/).
+A simple python wrapper for the [Firebase API](https://www.firebase.com/docs/rest/guide/).
 
 ## Installation
 

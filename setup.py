@@ -3,9 +3,9 @@ from setuptools import setup, find_packages
 
 setup(
     name='Pyrebase',
-    version='0.2.931',
+    version='0.2.932',
     url='https://github.com/thisbejim/Pyrebase',
-    description='A simple python interface for the Firebase REST API',
+    description='A simple python wrapper for the Firebase API',
     author='James Childs-Maidment',
     author_email='jchildsmaidment@outlook.com',
     license='MIT',
