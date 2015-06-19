@@ -44,8 +44,8 @@ Update data on a certain entry.
 
 ```
 data = '{"name": "Marty McJunior"}'
-put_this = ref.put("users", "Marty", data, None)
-print(put_this) # 200
+patch_this = ref.patch("users", "Marty", data, None)
+print(patch_this) # 200
 ```
 Updates "Marty Mcfly" to "Marty McJunior".
 
