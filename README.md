@@ -38,9 +38,20 @@ put_this = ref.put("users", data, None)
 print(put_this) # 200
 ```
 
+#### PATCH
+
+Update data on a certain entry.
+
+```
+data = '{"name": "Marty McJunior"}'
+put_this = ref.put("users", "Marty", data, None)
+print(put_this) # 200
+```
+Updates "Marty Mcfly" to "Marty McJunior".
+
 ### Reading Data
 
-There are four methods for retrieving data with Pyrebase: all, sort_by, sort_by_first, and sort_by_last.
+There are four methods for retrieving data with Pyrebase: all, one, sort_by, sort_by_first, and sort_by_last.
 
 #### Simple Queries
 
@@ -55,12 +66,22 @@ def my_callback():
 gimme_all = ref.all("users", my_callback())
 ```
 
+##### one
+
+One takes a child, an entry ID and a callback function and returns a single entry.
+
+one_article = ref.one("users", "Marty Mcfly", None)
+
+
 ##### sort_by
 
 Sort_by takes a child, category, and optional callback function, returning data sorted by category.
 
 ```
 my_users = ref.sort_by("users", "name", None)
+
+for i in my_users:
+    print(i["name"])
 ```
 
 #### Complex Queries

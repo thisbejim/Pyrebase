@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='Pyrebase',
-    version='0.2.9',
+    version='0.2.931',
     url='https://github.com/thisbejim/Pyrebase',
     description='A simple python interface for the Firebase REST API',
     author='James Childs-Maidment',
@@ -22,7 +22,7 @@ setup(
 
     keywords='Firebase',
 
-    packages=find_packages(),
+    packages=find_packages(exclude=['test']),
     install_requires=['requests_futures','firebase_token_generator'],
     package_dir={'requests': 'requests'}
 )

@@ -46,6 +46,24 @@ class Firebase():
 
         return request_list
 
+    def one(self, child, item_id, callback):
+        request_ref = '{0}{1}/{2}.json?auth={3}'.\
+            format(self.fire_base_url, child, item_id, self.token)
+
+        request_object = request.get(request_ref, background_callback=callback).result()
+
+        request_json = request_object.json()
+
+        if request_object.status_code != 200:
+            raise ValueError(request_json)
+
+        request_list = []
+
+        request_json["id"] = item_id
+        request_list.append(request_json)
+
+        return request_list
+
     def sort_by(self, child, category, callback):
         if category:
             request_ref = '{0}{1}.json?auth={2}&orderBy="{3}"'.\
@@ -139,5 +157,10 @@ class Firebase():
     def put(self, child, data, callback):
         request_ref = '{0}{1}.json?auth={2}'.format(self.fire_base_url, child, self.token)
         request_object = request.put(request_ref, data=data, background_callback=callback).result()
+        return request_object.status_code
+
+    def patch(self, child, item_id, data, callback):
+        request_ref = '{0}{1}/{2}.json?auth={3}'.format(self.fire_base_url, child, item_id, self.token)
+        request_object = request.patch(request_ref, data=data, background_callback=callback).result()
         return request_object.status_code
 
