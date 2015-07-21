@@ -1,4 +1,4 @@
-# Pyrebase
+# [Pyrebase](https://pypi.python.org/pypi/Pyrebase)
 
 A simple python wrapper for the [Firebase API](https://www.firebase.com/docs/rest/guide/).
 
@@ -22,7 +22,7 @@ To save data with an unique, auto-generated, timestamp-based key, use the POST m
 
 ```python
 data = '{"name": "Marty Mcfly", "date_created": "05-11-1955"}'
-post_this = ref.post("users", data, None)
+post_this = ref.post("users", data)
 print(post_this) # 200
 ```
 
