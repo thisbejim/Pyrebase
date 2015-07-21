@@ -4,6 +4,7 @@ from firebase_token_generator import create_token
 
 request = FuturesSession()
 
+
 class Firebase():
     """ Firebase Interface """
     def __init__(self, firebase_url, firebase_secret):
@@ -25,11 +26,11 @@ class Firebase():
     def info(self):
         return self.fire_base_url, self.token
 
-    def all(self, child, callback):
+    def all(self, child):
         request_ref = '{0}{1}.json?auth={2}'.\
             format(self.fire_base_url, child, self.token)
 
-        request_object = request.get(request_ref, background_callback=callback).result()
+        request_object = request.get(request_ref).result()
 
         request_json = request_object.json()
 
@@ -46,11 +47,11 @@ class Firebase():
 
         return request_list
 
-    def one(self, child, item_id, callback):
+    def one(self, child, item_id):
         request_ref = '{0}{1}/{2}.json?auth={3}'.\
             format(self.fire_base_url, child, item_id, self.token)
 
-        request_object = request.get(request_ref, background_callback=callback).result()
+        request_object = request.get(request_ref).result()
 
         request_json = request_object.json()
 
@@ -64,7 +65,7 @@ class Firebase():
 
         return request_list
 
-    def sort_by(self, child, category, callback):
+    def sort_by(self, child, category):
         if category:
             request_ref = '{0}{1}.json?auth={2}&orderBy="{3}"'.\
                 format(self.fire_base_url, child, self.token, category)
@@ -72,7 +73,7 @@ class Firebase():
             request_ref = '{0}{1}.json?auth={2}'.\
                 format(self.fire_base_url, child, self.token)
 
-        request_object = request.get(request_ref, background_callback=callback).result()
+        request_object = request.get(request_ref).result()
         request_json = request_object.json()
         if request_object.status_code != 200:
             raise ValueError(request_json)
@@ -88,16 +89,16 @@ class Firebase():
         try:
             request_list = sorted(request_list, key=itemgetter(category))
         except TypeError:
-            raise TypeError("Firebase category data type doesn't match across all entities.")
+            raise TypeError("Property types don't match.")
 
         return request_list
 
-    def sort_by_first(self, child, category, start_at, limit_to_first, callback):
+    def sort_by_first(self, child, category, start_at, limit_to_first):
 
         request_ref = '{0}{1}.json?auth={2}&orderBy="{3}"&startAt={4}&limitToFirst={5}'.\
             format(self.fire_base_url, child, self.token, category, start_at, limit_to_first)
 
-        request_object = request.get(request_ref, background_callback=callback).result()
+        request_object = request.get(request_ref).result()
         request_json = request_object.json()
 
         if request_object.status_code != 200:
@@ -115,11 +116,11 @@ class Firebase():
         try:
             request_list = sorted(request_list, key=itemgetter(category))
         except TypeError:
-            raise TypeError("Data type doesn't match across entities.")
+            raise TypeError("Property types don't match.")
 
         return request_list
 
-    def sort_by_last(self, child, category, start_at, limit_to_last, callback):
+    def sort_by_last(self, child, category, start_at, limit_to_last):
         if start_at:
             request_ref = '{0}{1}.json?auth={2}&orderBy="{3}"&endAt={4}&limitToLast={5}'.\
                 format(self.fire_base_url, child, self.token, category, start_at, limit_to_last)
@@ -127,7 +128,7 @@ class Firebase():
             request_ref = '{0}{1}.json?auth={2}&orderBy="{3}"&limitToLast={4}'.\
                 format(self.fire_base_url, child, self.token, category, limit_to_last)
 
-        request_object = request.get(request_ref, background_callback=callback).result()
+        request_object = request.get(request_ref).result()
         request_json = request_object.json()
 
         if request_object.status_code != 200:
@@ -145,22 +146,22 @@ class Firebase():
         try:
             request_list = sorted(request_list, key=itemgetter(category), reverse=True)
         except TypeError:
-            raise TypeError("Firebase category data type doesn't match across all entities.")
+            raise TypeError("Property types don't match.")
 
         return request_list
 
-    def post(self, child, data, callback):
+    def post(self, child, data):
         request_ref = '{0}{1}.json?auth={2}'.format(self.fire_base_url, child, self.token)
-        request_object = request.post(request_ref, data=data, background_callback=callback).result()
+        request_object = request.post(request_ref, data=data).result()
         return request_object.status_code
 
-    def put(self, child, data, callback):
+    def put(self, child, data):
         request_ref = '{0}{1}.json?auth={2}'.format(self.fire_base_url, child, self.token)
-        request_object = request.put(request_ref, data=data, background_callback=callback).result()
+        request_object = request.put(request_ref, data=data).result()
         return request_object.status_code
 
-    def patch(self, child, item_id, data, callback):
+    def patch(self, child, item_id, data):
         request_ref = '{0}{1}/{2}.json?auth={3}'.format(self.fire_base_url, child, item_id, self.token)
-        request_object = request.patch(request_ref, data=data, background_callback=callback).result()
+        request_object = request.patch(request_ref, data=data).result()
         return request_object.status_code
 
