@@ -5,4 +5,4 @@ build
 dist
 test.py
 __pycache__
-
+setup.py
