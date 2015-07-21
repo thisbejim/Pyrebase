@@ -18,7 +18,7 @@ ref = pyrebase.Firebase('https://yourfirebaseurl.firebaseio.com', 'yourfirebases
 
 #### POST
 
-To save data with an unique, auto-generated, timestamp-based key, use the POST method.
+To save data with a unique, auto-generated, timestamp-based key, use the POST method.
 
 ```python
 data = '{"name": "Marty Mcfly", "date_created": "05-11-1955"}'
@@ -38,7 +38,7 @@ put_this = ref.put("users", data)
 
 #### PATCH
 
-Update data for an existing entry.
+To update data for an existing entry use the PATCH method.
 
 ```python
 data = '{"name": "Marty McJunior"}'
@@ -73,7 +73,7 @@ Takes a database reference and a property, returning all reference data sorted b
 ```python
 users_by_name = ref.sort_by("users", "name")
 
-for i in users:
+for i in users_by_name:
     print(i["name"])
 ```
 
@@ -107,10 +107,9 @@ This query returns 10 users with an age of 25 or less.
 
 #### Index not defined
 
-Please make sure that the database references you are querying have indexing
-[set up properly](https://www.firebase.com/docs/security/guide/indexing-data.html) on Firebase.
+Indexing is [not enabled](https://www.firebase.com/docs/security/guide/indexing-data.html) for the database reference.
 
 #### Property types don't match
 
-Querying properties are not the same type.
+Returned properties are not of the same data type.
 Example: name: 0 and name: "hello".
