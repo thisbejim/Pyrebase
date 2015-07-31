@@ -39,7 +39,7 @@ class Firebase():
         request_json = request_object.json()
 
         if request_object.status_code != 200:
-            raise ValueError(request_json)
+            return request_json
 
         request_list = []
 
@@ -60,7 +60,7 @@ class Firebase():
         request_json = request_object.json()
 
         if request_object.status_code != 200:
-            raise ValueError(request_json)
+            return request_json
 
         request_list = []
 
@@ -80,7 +80,7 @@ class Firebase():
         request_object = request.get(request_ref).result()
         request_json = request_object.json()
         if request_object.status_code != 200:
-            raise ValueError(request_json)
+            return request_json
 
         request_list = []
         # put dictionary in list for sorting
@@ -106,7 +106,7 @@ class Firebase():
         request_json = request_object.json()
 
         if request_object.status_code != 200:
-            raise ValueError(request_json)
+            return request_json
 
         request_list = []
 
@@ -136,7 +136,7 @@ class Firebase():
         request_json = request_object.json()
 
         if request_object.status_code != 200:
-            raise ValueError(request_json)
+            return request_json
 
         request_list = []
 
