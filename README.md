@@ -26,6 +26,8 @@ Passing in a third parameter containing a uid will authenticate a user.
 user = pyrebase.Firebase('https://yourfirebaseurl.firebaseio.com', 'yourfirebasesecret', 'simplelogin:1')
 ```
 
+Ideally you will initialise many Firebase connections throughout your application.
+
 
 ### Saving Data
 
