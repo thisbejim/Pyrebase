@@ -7,20 +7,24 @@ request = FuturesSession()
 
 class Firebase():
     """ Firebase Interface """
-    def __init__(self, firebase_url, firebase_secret):
+    def __init__(self, fire_base_url, fire_base_secret, uid=False):
 
-        if not firebase_url.endswith('/'):
-            url = ''.join([firebase_url, '/'])
+        if not fire_base_url.endswith('/'):
+            url = ''.join([fire_base_url, '/'])
         else:
-            url = firebase_url
-
-        # get auth token
-        auth_payload = {"uid": "1", "auth_data": "foo", "other_auth_data": "bar"}
-        # disregard security rules
-        options = {"admin": True}
-        token = create_token(firebase_secret, auth_payload, options)
+            url = fire_base_url
+        if uid:
+            # get auth token
+            auth_payload = {"uid": uid}
+            # generate user token
+            token = create_token(fire_base_secret, auth_payload)
+        else:
+            auth_payload = {"uid": "1"}
+            options = {"admin": True}
+            token = create_token(fire_base_secret, auth_payload, options)
 
         self.fire_base_url = url
+        self.secret = fire_base_secret
         self.token = token
 
     def info(self):

@@ -10,9 +10,22 @@ pip install pyrebase
 
 ### Initialising your Firebase
 
+#### Admin
+
+Basic initialisation disregards your security rules and authenticates an admin.
+
 ```
-ref = pyrebase.Firebase('https://yourfirebaseurl.firebaseio.com', 'yourfirebasesecret')
+admin = pyrebase.Firebase('https://yourfirebaseurl.firebaseio.com', 'yourfirebasesecret')
 ```
+
+#### User
+
+Passing in a third parameter containing a uid will authenticate a user.
+
+```
+user = pyrebase.Firebase('https://yourfirebaseurl.firebaseio.com', 'yourfirebasesecret', 'simplelogin:1')
+```
+
 
 ### Saving Data
 
