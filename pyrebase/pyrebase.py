@@ -1,6 +1,7 @@
 from operator import itemgetter
 from requests_futures.sessions import FuturesSession
 from firebase_token_generator import create_token
+import re
 
 request = FuturesSession()
 
@@ -13,6 +14,14 @@ class Firebase():
             url = ''.join([fire_base_url, '/'])
         else:
             url = fire_base_url
+
+        result = re.search('https://(.*).firebaseio.com', fire_base_url)
+        if result:
+            name = result.group(1)
+        else:
+            result = re.search('(.*).firebaseio.com', fire_base_url)
+            name = result.group(1)
+
         if uid:
             # get auth token
             auth_payload = {"uid": uid}
@@ -24,11 +33,18 @@ class Firebase():
             token = create_token(fire_base_secret, auth_payload, options)
 
         self.fire_base_url = url
+        self.fire_base_name = name
         self.secret = fire_base_secret
         self.token = token
 
     def info(self):
         return self.fire_base_url, self.token
+
+    def create(self, email, password):
+        request_ref = 'https://auth.firebase.com/auth/firebase/create?firebase={0}&email={1}&password={2}'.\
+            format(self.fire_base_name, email, password)
+        request_object = request.get(request_ref).result()
+        return request_object.text
 
     def all(self, child):
         request_ref = '{0}{1}.json?auth={2}'.\
