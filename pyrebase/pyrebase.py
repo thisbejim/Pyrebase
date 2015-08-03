@@ -8,43 +8,53 @@ request = FuturesSession()
 
 class Firebase():
     """ Firebase Interface """
-    def __init__(self, fire_base_url, fire_base_secret, uid=False):
-
+    def __init__(self, fire_base_url, fire_base_secret, email=False, password=False):
         if not fire_base_url.endswith('/'):
             url = ''.join([fire_base_url, '/'])
         else:
             url = fire_base_url
 
-        result = re.search('https://(.*).firebaseio.com', fire_base_url)
-        if result:
-            name = result.group(1)
+        # find db name between http:// and .firebaseio.com
+        db_name = re.search('https://(.*).firebaseio.com', fire_base_url)
+        if db_name:
+            name = db_name.group(1)
         else:
-            result = re.search('(.*).firebaseio.com', fire_base_url)
-            name = result.group(1)
+            db_name = re.search('(.*).firebaseio.com', fire_base_url)
+            name = db_name.group(1)
 
-        if uid:
-            # get auth token
-            auth_payload = {"uid": uid}
-            # generate user token
-            token = create_token(fire_base_secret, auth_payload)
+        if email and password:
+            request_ref = 'https://auth.firebase.com/auth/firebase?firebase={0}&email={1}&password={2}'.\
+                format(name, email, password)
+            request_object = request.get(request_ref).result()
+            request_json = request_object.json()
+            self.email = email
+            self.password = password
+            self.uid = request_json['user']['uid']
+            self.token = request_json['token']
         else:
             auth_payload = {"uid": "1"}
             options = {"admin": True}
             token = create_token(fire_base_secret, auth_payload, options)
+            self.token = token
+            self.email = None
+            self. password = None
+            self.uid = None
 
         self.fire_base_url = url
         self.fire_base_name = name
         self.secret = fire_base_secret
-        self.token = token
 
     def info(self):
-        return self.fire_base_url, self.token
+        info_list = {'url': self.fire_base_url, 'token': self.token, 'email': self.email, 'password': self.password,
+                     'uid': self.uid}
+        return info_list
 
     def create(self, email, password):
         request_ref = 'https://auth.firebase.com/auth/firebase/create?firebase={0}&email={1}&password={2}'.\
             format(self.fire_base_name, email, password)
         request_object = request.get(request_ref).result()
-        return request_object.text
+        request_json = request_object.json()
+        return request_json
 
     def all(self, child):
         request_ref = '{0}{1}.json?auth={2}'.\
