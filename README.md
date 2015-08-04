@@ -33,6 +33,13 @@ Initialise your Firebase with an additional email and password. Security rules a
 ```python
 user = pyrebase.Firebase('https://yourfirebaseurl.firebaseio.com', 'yourfirebasesecret', 'email', 'password')
 ```
+### Connection Info
+
+Learn more about your current connection.
+
+```python
+print(user.info['uid']) # simplelogin:42
+```
 
 ### Saving Data
 
