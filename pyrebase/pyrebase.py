@@ -125,7 +125,6 @@ class Firebase():
                 request_list = sorted(request_list, key=itemgetter(prop), reverse=True)
             else:
                 request_list = sorted(request_list, key=itemgetter(prop))
-                request_list = sorted(request_list, key=itemgetter(prop))
         except TypeError:
             raise TypeError("Property types don't match.")
 
