@@ -6,11 +6,10 @@ A simple python wrapper for the [Firebase API](https://www.firebase.com/docs/res
 
 pip install pyrebase
 
-## Usage
 
-### Initialising your Firebase
+## Initialising your Firebase
 
-#### Admin
+### Admin
 
 Authenticating as an admin will disregard your security rules.
 
@@ -33,6 +32,7 @@ Initialise your Firebase with an additional email and password. Security rules a
 ```python
 user = pyrebase.Firebase('https://yourfirebaseurl.firebaseio.com', 'yourfirebasesecret', 'email', 'password')
 ```
+
 ### Connection Info
 
 Learn more about your current connection.
@@ -41,9 +41,10 @@ Learn more about your current connection.
 print(user.info['uid']) # simplelogin:42
 ```
 
-### Saving Data
 
-#### POST
+## Saving Data
+
+### POST
 
 To save data with a unique, auto-generated, timestamp-based key, use the POST method.
 
@@ -52,7 +53,7 @@ data = '{"name": "Marty Mcfly", "date": "05-11-1955"}'
 admin.post("users", data)
 ```
 
-#### PUT
+### PUT
 
 To create your own keys use the PUT method. The key in the example below is "Marty".
 
@@ -61,7 +62,7 @@ data = '{"Marty": {"name": "Marty Mcfly", "date":"05-11-1955"}}'
 admin.put("users", data)
 ```
 
-#### PATCH
+### PATCH
 
 To update data for an existing entry use the PATCH method.
 
@@ -70,11 +71,12 @@ data = '{"date": "26-10-1985"}'
 admin.patch("users", "Marty", data)
 ```
 
-### Reading Data
 
-#### Simple Queries
+## Reading Data
 
-##### all
+### Simple Queries
+
+#### all
 
 Takes a database reference, returning all reference data.
 
@@ -82,7 +84,7 @@ Takes a database reference, returning all reference data.
 all_users = admin.all("users")
 ```
 
-##### one
+#### one
 
 Takes a database reference and a key, returning a single entry.
 
@@ -90,7 +92,7 @@ Takes a database reference and a key, returning a single entry.
 one_user = admin.one("users", "Marty Mcfly")
 ```
 
-##### sort
+#### sort
 
 Takes a database reference and a property, returning all reference data sorted by property.
 
@@ -101,9 +103,9 @@ for i in users_by_name:
     print(i["name"])
 ```
 
-#### Complex Queries
+### Complex Queries
 
-##### first
+#### first
 
 Takes a database reference, a property, a starting value, a return limit, and a query direction,
 returning limited reference data sorted by property.
@@ -114,7 +116,7 @@ results = admin.sort("users", "age", 25, 10, "first")
 
 This query returns 10 users with an age of 25 or more.
 
-##### last
+#### last
 
 Takes a database reference, a property, a starting value, a return limit, and a query direction,
 returning limited reference data sorted by property.
@@ -127,13 +129,13 @@ results = admin.sort("users", "age", 25, 10, "last")
 This query returns 10 users with an age of 25 or less.
 
 
-### Common Errors
+## Common Errors
 
-#### Index not defined
+### Index not defined
 
 Indexing is [not enabled](https://www.firebase.com/docs/security/guide/indexing-data.html) for the database reference.
 
-#### Property types don't match
+### Property types don't match
 
 Returned properties are not of the same data type.
 Example: name: 0 and name: "hello".
