@@ -95,13 +95,17 @@ class Firebase():
 
         return request_list
 
-    def sort_by(self, child, category):
-        if category:
+    def sort(self, child, prop, start=None, limit=None, direction=None):
+        if start and limit and direction:
+            if direction == "last":
+                direction = "limitToLast"
+            else:
+                direction = "limitToFirst"
+            request_ref = '{0}{1}.json?auth={2}&orderBy="{3}"&endAt={4}&{5}={6}'.\
+                format(self.fire_base_url, child, self.token, prop, start, direction, limit)
+        else:
             request_ref = '{0}{1}.json?auth={2}&orderBy="{3}"'.\
-                format(self.fire_base_url, child, self.token, category)
-        else:
-            request_ref = '{0}{1}.json?auth={2}'.\
-                format(self.fire_base_url, child, self.token)
+                format(self.fire_base_url, child, self.token, prop)
 
         request_object = request.get(request_ref).result()
         request_json = request_object.json()
@@ -117,64 +121,11 @@ class Firebase():
 
         # sort list by category
         try:
-            request_list = sorted(request_list, key=itemgetter(category))
-        except TypeError:
-            raise TypeError("Property types don't match.")
-
-        return request_list
-
-    def sort_by_first(self, child, category, start_at, limit_to_first):
-
-        request_ref = '{0}{1}.json?auth={2}&orderBy="{3}"&startAt={4}&limitToFirst={5}'.\
-            format(self.fire_base_url, child, self.token, category, start_at, limit_to_first)
-
-        request_object = request.get(request_ref).result()
-        request_json = request_object.json()
-
-        if request_object.status_code != 200:
-            return request_json
-
-        request_list = []
-
-        # put dictionary in list for sorting
-        for i in request_json:
-            # add ID key and assign id
-            request_json[i]["id"] = i
-            request_list.append(request_json[i])
-
-        # sort list by category
-        try:
-            request_list = sorted(request_list, key=itemgetter(category))
-        except TypeError:
-            raise TypeError("Property types don't match.")
-
-        return request_list
-
-    def sort_by_last(self, child, category, start_at, limit_to_last):
-        if start_at:
-            request_ref = '{0}{1}.json?auth={2}&orderBy="{3}"&endAt={4}&limitToLast={5}'.\
-                format(self.fire_base_url, child, self.token, category, start_at, limit_to_last)
-        else:
-            request_ref = '{0}{1}.json?auth={2}&orderBy="{3}"&limitToLast={4}'.\
-                format(self.fire_base_url, child, self.token, category, limit_to_last)
-
-        request_object = request.get(request_ref).result()
-        request_json = request_object.json()
-
-        if request_object.status_code != 200:
-            return request_json
-
-        request_list = []
-
-        # put dictionary in list for sorting
-        for i in request_json:
-            # add ID key and assign id
-            request_json[i]["id"] = i
-            request_list.append(request_json[i])
-
-        # sort list by category
-        try:
-            request_list = sorted(request_list, key=itemgetter(category), reverse=True)
+            if direction == "limitToLast":
+                request_list = sorted(request_list, key=itemgetter(prop), reverse=True)
+            else:
+                request_list = sorted(request_list, key=itemgetter(prop))
+                request_list = sorted(request_list, key=itemgetter(prop))
         except TypeError:
             raise TypeError("Property types don't match.")
 
