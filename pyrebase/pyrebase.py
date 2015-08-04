@@ -99,10 +99,12 @@ class Firebase():
         if start and limit and direction:
             if direction == "last":
                 direction = "limitToLast"
+                at = "startAt"
             else:
                 direction = "limitToFirst"
-            request_ref = '{0}{1}.json?auth={2}&orderBy="{3}"&endAt={4}&{5}={6}'.\
-                format(self.fire_base_url, child, self.token, prop, start, direction, limit)
+                at = "endAt"
+            request_ref = '{0}{1}.json?auth={2}&orderBy="{3}"&{4}={5}&{6}={7}'.\
+                format(self.fire_base_url, child, self.token, prop, at, start, direction, limit)
         else:
             request_ref = '{0}{1}.json?auth={2}&orderBy="{3}"'.\
                 format(self.fire_base_url, child, self.token, prop)
