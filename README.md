@@ -49,8 +49,9 @@ print(user.info['uid']) # simplelogin:42
 To save data with a unique, auto-generated, timestamp-based key, use the POST method.
 
 ```python
-data = '{"name": "Marty Mcfly", "date": "05-11-1955"}'
-admin.post("users", data)
+import json
+data = {"name": "Marty Mcfly", "date": "05-11-1955"}
+admin.post("users", json.dumps(data))
 ```
 
 ### PUT
@@ -58,8 +59,9 @@ admin.post("users", data)
 To create your own keys use the PUT method. The key in the example below is "Marty".
 
 ```python
-data = '{"Marty": {"name": "Marty Mcfly", "date":"05-11-1955"}}'
-admin.put("users", data)
+import json
+data = {"Marty": {"name": "Marty Mcfly", "date":"05-11-1955"}}
+admin.put("users", json.dumps(data))
 ```
 
 ### PATCH
@@ -67,8 +69,9 @@ admin.put("users", data)
 To update data for an existing entry use the PATCH method.
 
 ```python
-data = '{"date": "26-10-1985"}'
-admin.patch("users", "Marty", data)
+import json
+data = {"date": "26-10-1985"}
+admin.patch("users", "Marty", json.dumps(data))
 ```
 
 
