@@ -147,3 +147,7 @@ class Firebase():
         request_object = request.patch(request_ref, data=data).result()
         return request_object.status_code
 
+    def delete(self, child):
+        request_ref = '{0}{1}.json?auth={2}'.format(self.fire_base_url, child, self.token)
+        request_object = request.delete(request_ref).result()
+        return request_object.status_code

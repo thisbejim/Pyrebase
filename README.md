@@ -74,6 +74,14 @@ data = {"date": "26-10-1985"}
 admin.patch("users", "Marty", json.dumps(data))
 ```
 
+### DELETE
+
+To delete data for an existing entry use the DELETE method.
+
+```python
+admin.delete("users/Marty")
+```
+
 
 ## Reading Data
 
