@@ -95,6 +95,14 @@ Takes a database reference, returning all reference data.
 all_users = admin.all("users")
 ```
 
+#### keys
+
+Takes a database reference, returning all keys beneath that point. This does not get the full tree of data from Firebase.
+
+```python
+all_user_ids = admin.keys("users")
+```
+
 #### one
 
 Takes a database reference and a key, returning a single entry.

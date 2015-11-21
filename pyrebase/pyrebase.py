@@ -77,6 +77,19 @@ class Firebase():
 
         return request_list
 
+    def keys(self, child):
+        request_ref = '{0}{1}.json?auth={2}&shallow=true'.\
+            format(self.fire_base_url, child, self.token)
+
+        request_object = request.get(request_ref).result()
+
+        request_json = request_object.json()
+
+        if request_object.status_code != 200:
+            return request_json
+
+        return request_json.keys()
+
     def one(self, child, item_id):
         request_ref = '{0}{1}/{2}.json?auth={3}'.\
             format(self.fire_base_url, child, item_id, self.token)
