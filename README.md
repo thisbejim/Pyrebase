@@ -74,6 +74,14 @@ data = {"date": "26-10-1985"}
 admin.patch("users", "Marty", json.dumps(data))
 ```
 
+### DELETE
+
+To delete data for an existing entry use the DELETE method.
+
+```python
+admin.delete("users/Marty")
+```
+
 
 ## Reading Data
 
@@ -85,6 +93,14 @@ Takes a database reference, returning all reference data.
 
 ```python
 all_users = admin.all("users")
+```
+
+#### keys
+
+Takes a database reference, returning all keys beneath that point. This does not get the full tree of data from Firebase.
+
+```python
+all_user_ids = admin.keys("users")
 ```
 
 #### one
