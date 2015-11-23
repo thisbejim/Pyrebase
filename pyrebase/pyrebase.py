@@ -101,12 +101,8 @@ class Firebase():
         if request_object.status_code != 200:
             return request_json
 
-        request_list = []
-
         request_json["id"] = item_id
-        request_list.append(request_json)
-
-        return request_list
+        return request_json
 
     def sort(self, child, prop, start=None, limit=None, direction=None):
         if start and limit and direction:
