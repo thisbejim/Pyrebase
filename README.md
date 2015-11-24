@@ -89,12 +89,18 @@ admin.delete("users/Marty")
 
 ### Simple Queries
 
-#### all
+#### query
 
 Takes a database reference, returning all reference data.
 
 ```python
-all_users = admin.all("users")
+all_users = admin.query("users").get()
+```
+
+To retrieve one entry just expand the path.
+
+```python
+one_user = admin.query("users/Marty").get()
 ```
 
 #### keys
@@ -105,50 +111,24 @@ Takes a database reference, returning all keys beneath that point. This does not
 all_user_ids = admin.keys("users")
 ```
 
-#### one
-
-Takes a database reference and a key, returning a single entry.
-
-```python
-one_user = admin.one("users", "Marty Mcfly")
-```
-
-#### sort
-
-Takes a database reference and a property, returning all reference data sorted by property.
-
-```python
-users = admin.sort("users", "name")
-
-for i in users_by_name:
-    print(i["name"])
-```
 
 ### Complex Queries
 
-#### first
+Queries can be chained in much the same way that they are in the [javascript library](https://www.firebase.com/docs/web/guide/retrieving-data.html#section-complex-queries).
 
-Takes a database reference, a property, a starting value, a return limit, and a query direction,
-returning limited reference data sorted by property.
+Docs coming...
 
-```python
-results = admin.sort("users", "age", 25, 10, "first")
-```
+#### orderBy
 
-This query returns 10 users with an age of 25 or more.
+#### equalTo
 
-#### last
+#### startAt
 
-Takes a database reference, a property, a starting value, a return limit, and a query direction,
-returning limited reference data sorted by property.
+#### endAt
 
+#### limitToFirst
 
-```python
-results = admin.sort("users", "age", 25, 10, "last")
-```
-
-This query returns 10 users with an age of 25 or less.
-
+#### limitToLast
 
 ## Common Errors
 

@@ -1,9 +1,9 @@
 from operator import itemgetter
 from requests_futures.sessions import FuturesSession
 from firebase_token_generator import create_token
-from urllib.parse import urlencode
+from urllib.parse import urlencode, quote
 import re
-
+import json
 request = FuturesSession()
 
 
@@ -44,6 +44,57 @@ class Firebase():
         self.fire_base_url = url
         self.fire_base_name = name
         self.secret = fire_base_secret
+        self.child = ""
+        self.buildQuery = {}
+
+    def orderBy(self, order):
+        if order == "$key":
+            order = "key"
+        self.buildQuery["orderBy"] = order
+        return self
+
+    def startAt(self, start):
+        self.buildQuery["startAt"] = start
+        return self
+
+    def endAt(self, end):
+        self.buildQuery["endAt"] = end
+        return self
+
+    def equalTo(self, equal):
+        self.buildQuery["equalTo"] = equal
+        return self
+
+    def limitToFirst(self, limitFirst):
+        self.buildQuery["limitToLast"] = limitFirst
+        return self
+
+    def limitToLast(self, limitLast):
+        self.buildQuery["limitToLast"] = limitLast
+        return self
+
+    def query(self, child):
+        self.child = child
+        return self
+
+    def get(self):
+        parameters = {}
+        parameters['auth'] = self.token
+        for param in list(self.buildQuery):
+            if type(self.buildQuery[param]) is str:
+                parameters[param] = quote('"' + self.buildQuery[param] + '"')
+            else:
+                parameters[param] = self.buildQuery[param]
+        request_ref = '{0}{1}.json?{2}'.format(self.fire_base_url, self.child, urlencode(parameters))
+        request_object = request.get(request_ref).result()
+        request_dict = json.loads(str(request_object.text))
+        results = []
+        for i in request_dict:
+            request_dict[i]["key"] = i
+            results.append(request_dict[i])
+        if self.buildQuery and self.buildQuery["orderBy"]:
+            results = sorted(results, key=itemgetter(self.buildQuery["orderBy"]))
+        return results
 
     def info(self):
         info_list = {'url': self.fire_base_url, 'token': self.token, 'email': self.email, 'password': self.password,
@@ -57,27 +108,6 @@ class Firebase():
         request_json = request_object.json()
         return request_json
 
-    def all(self, child):
-        request_ref = '{0}{1}.json?auth={2}'.\
-            format(self.fire_base_url, child, self.token)
-
-        request_object = request.get(request_ref).result()
-
-        request_json = request_object.json()
-
-        if request_object.status_code != 200:
-            return request_json
-
-        request_list = []
-
-        # put dictionary in list
-        for i in request_json:
-            # add ID key and assign id
-            request_json[i]["id"] = i
-            request_list.append(request_json[i])
-
-        return request_list
-
     def keys(self, child):
         request_ref = '{0}{1}.json?auth={2}&shallow=true'.\
             format(self.fire_base_url, child, self.token)
@@ -90,65 +120,6 @@ class Firebase():
             return request_json
 
         return request_json.keys()
-
-    def one(self, child, item_id):
-        request_ref = '{0}{1}/{2}.json?auth={3}'.\
-            format(self.fire_base_url, child, item_id, self.token)
-
-        request_object = request.get(request_ref).result()
-
-        request_json = request_object.json()
-
-        if request_object.status_code != 200:
-            return request_json
-
-        if isinstance(request_json, dict):
-            request_json["id"] = item_id
-
-        return request_json
-
-    def sort(self, child, prop, start=None, limit=None, direction=None):
-        if start and limit and direction:
-            if direction == "last":
-                direction = "limitToLast"
-                at = "endAt"
-            else:
-                direction = "limitToFirst"
-                at = "startAt"
-            request_ref = '{0}{1}.json?auth={2}&orderBy="{3}"&{4}={5}&{6}={7}'.\
-                format(self.fire_base_url, child, self.token, prop, at, start, direction, limit)
-        else:
-            request_ref = '{0}{1}.json?auth={2}&orderBy="{3}"'.\
-                format(self.fire_base_url, child, self.token, prop)
-
-        request_object = request.get(request_ref).result()
-        request_json = request_object.json()
-        if request_object.status_code != 200:
-            return request_json
-
-        request_list = []
-        # put dictionary in list for sorting
-        for i in request_json:
-            # add ID key and assign id
-            request_json[i]["id"] = i
-            request_list.append(request_json[i])
-
-        # sort list by category
-        try:
-            if direction == "limitToLast":
-                request_list = sorted(request_list, key=itemgetter(prop), reverse=True)
-            else:
-                request_list = sorted(request_list, key=itemgetter(prop))
-        except TypeError:
-            raise TypeError("Property types don't match.")
-
-        return request_list
-
-    def get(self, child, parameters={}):
-        parameters['auth'] = self.token
-        request_ref = '{0}{1}.json?{2}'.format(self.fire_base_url, child, urlencode(parameters))
-        request_object = request.get(request_ref).result()
-        return request_object.json()
 
     def post(self, child, data):
         request_ref = '{0}{1}.json?auth={2}'.format(self.fire_base_url, child, self.token)
