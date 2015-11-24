@@ -93,6 +93,8 @@ class Firebase():
             request_dict[i]["key"] = i
             results.append(request_dict[i])
         if self.buildQuery and self.buildQuery["orderBy"]:
+            if self.buildQuery["orderBy"] == "$key":
+                self.buildQuery["orderBy"] = "key"
             results = sorted(results, key=itemgetter(self.buildQuery["orderBy"]))
         return results
 
