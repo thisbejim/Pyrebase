@@ -1,6 +1,7 @@
 from operator import itemgetter
 from requests_futures.sessions import FuturesSession
 from firebase_token_generator import create_token
+from urllib.parse import urlencode
 import re
 
 request = FuturesSession()
@@ -101,7 +102,8 @@ class Firebase():
         if request_object.status_code != 200:
             return request_json
 
-        request_json["id"] = item_id
+        if isinstance(request_json, dict):
+            request_json["id"] = item_id
 
         return request_json
 
@@ -141,6 +143,12 @@ class Firebase():
             raise TypeError("Property types don't match.")
 
         return request_list
+
+    def get(self, child, parameters={}):
+        parameters['auth'] = self.token
+        request_ref = '{0}{1}.json?{2}'.format(self.fire_base_url, child, urlencode(parameters))
+        request_object = request.get(request_ref).result()
+        return request_object.json()
 
     def post(self, child, data):
         request_ref = '{0}{1}.json?auth={2}'.format(self.fire_base_url, child, self.token)
