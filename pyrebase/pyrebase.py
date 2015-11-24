@@ -71,6 +71,10 @@ class Firebase():
         self.buildQuery["limitToLast"] = limitLast
         return self
 
+    def shallow(self):
+        self.buildQuery["shallow"] = True
+        return self
+
     def query(self, child):
         self.child = child
         return self
@@ -99,6 +103,9 @@ class Firebase():
             if self.buildQuery["orderBy"] == "$key":
                 self.buildQuery["orderBy"] = "key"
             results = sorted(results, key=itemgetter(self.buildQuery["orderBy"]))
+        # return keys if shallow is enabled
+        if self.buildQuery and self.buildQuery["shallow"]:
+            return results.keys()
         return results
 
     def info(self):
