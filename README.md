@@ -101,6 +101,8 @@ To retrieve one entry just expand the path.
 
 ```python
 one_user = admin.query("users/Marty").get()
+# or:
+one_user = admin.query("users", "Marty").get()
 ```
 
 #### keys
