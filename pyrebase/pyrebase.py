@@ -48,8 +48,6 @@ class Firebase():
         self.buildQuery = {}
 
     def orderBy(self, order):
-        if order == "$key":
-            order = "key"
         self.buildQuery["orderBy"] = order
         return self
 
