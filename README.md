@@ -164,6 +164,15 @@ users_by_score = admin.query("users").orderBy("score").limitToFirst(5).get()
 ```
 This query returns the first five users ordered by score.
 
+#### shallow
+
+Fetches only the keys and returns them in a list
+
+Example:
+```python
+user_ids = admin.query("users").shallow().get()
+```
+
 ## Common Errors
 
 ### Index not defined
