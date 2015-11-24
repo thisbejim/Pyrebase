@@ -6,3 +6,4 @@ dist
 test.py
 __pycache__
 *.pyc
+pyrebase.py.orig

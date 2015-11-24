@@ -75,8 +75,8 @@ class Firebase():
         self.buildQuery["shallow"] = True
         return self
 
-    def query(self, child):
-        self.child = child
+    def query(self, *args):
+        self.child = "/".join(args)
         return self
 
     def get(self):
