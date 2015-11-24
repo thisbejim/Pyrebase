@@ -71,8 +71,8 @@ class Firebase():
         self.buildQuery["limitToLast"] = limitLast
         return self
 
-    def query(self, child):
-        self.child = child
+    def query(self, *args):
+        self.child = "/".join(args)
         return self
 
     def get(self):
