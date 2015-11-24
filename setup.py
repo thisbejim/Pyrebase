@@ -5,8 +5,7 @@ setup(
     version='0.3',
     url='https://github.com/thisbejim/Pyrebase',
     description='A simple python wrapper for the Firebase API',
-    author='James Childs-Maidment',
-    author_email='jchildsmaidment@outlook.com',
+    author='https://github.com/thisbejim/Pyrebase/graphs/contributors',
     license='MIT',
     classifiers=[
         'Development Status :: 3 - Alpha',

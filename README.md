@@ -4,7 +4,9 @@ A simple python wrapper for the [Firebase API](https://www.firebase.com/docs/res
 
 ## Installation
 
+```python
 pip install pyrebase
+```
 
 
 ## Initialising your Firebase
@@ -38,7 +40,7 @@ user = pyrebase.Firebase('https://yourfirebaseurl.firebaseio.com', 'yourfirebase
 Learn more about your current connection.
 
 ```python
-print(user.info['uid']) # simplelogin:42
+print(user.info['uid']) # -K2QRiOt8oQ5vBYS5mI1
 ```
 
 
