@@ -114,21 +114,53 @@ all_user_ids = admin.keys("users")
 
 ### Complex Queries
 
-Queries can be chained in much the same way that they are in the [javascript library](https://www.firebase.com/docs/web/guide/retrieving-data.html#section-complex-queries).
+Queries can be built by chaining multiple query parameters together (in much the same way as they are in the [javascript library](https://www.firebase.com/docs/web/guide/retrieving-data.html#section-complex-queries)).
 
-Docs coming...
+Example:
+```python
+users_by_name = admin.query("users").orderBy("name").limitToFirst(3).get()
+```
+This query will return the first three users ordered by name.
 
 #### orderBy
 
+We begin any complex query with the orderBy parameter.
+
+Example:
+```python
+users_by_name = admin.query("users").orderBy("name").get()
+```
+This query will return users ordered by name.
+
 #### equalTo
 
-#### startAt
+Return data with a specific value.
 
-#### endAt
+Example:
+```python
+users_by_score = admin.query("users").orderBy("score").equalTo(10).get()
+```
+This query will return users with a score of 10.
 
-#### limitToFirst
+#### startAt and endAt
 
-#### limitToLast
+Specify a range in your data.
+
+Example:
+```python
+users_by_score = admin.query("users").orderBy("score").startAt(3).endAt(10).get()
+```
+This query returns users ordered by score and with a score between 3 and 10.
+
+#### limitToFirst and limitToLast
+
+Limits data returned.
+
+Example:
+```python
+users_by_score = admin.query("users").orderBy("score").limitToFirst(5).get()
+```
+This query returns the first five users ordered by score.
 
 ## Common Errors
 

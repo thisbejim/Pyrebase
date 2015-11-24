@@ -86,11 +86,11 @@ class Firebase():
         request_ref = '{0}{1}.json?{2}'.format(self.fire_base_url, self.child, urlencode(parameters))
         request_object = request.get(request_ref).result()
         request_dict = json.loads(str(request_object.text))
-        results = []
         # if only one result return dict
         if not isinstance(list(request_dict.values())[0], dict):
             return request_dict
         # otherwise place in list
+        results = []
         for i in request_dict:
             request_dict[i]["key"] = i
             results.append(request_dict[i])
