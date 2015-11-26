@@ -44,7 +44,7 @@ class Firebase():
         self.fire_base_url = url
         self.fire_base_name = name
         self.secret = fire_base_secret
-        self.child = ""
+        self.path = ""
         self.buildQuery = {}
 
     def orderBy(self, order):
@@ -75,8 +75,14 @@ class Firebase():
         self.buildQuery["shallow"] = True
         return self
 
-    def query(self, *args):
-        self.child = "/".join(args)
+    def child(self, *args):
+        new_path = "/".join(args)
+        if self.path:
+            self.path += "/{}".format(new_path)
+        else:
+            if new_path.startswith("/"):
+                new_path = new_path[1:]
+            self.path += new_path
         return self
 
     def get(self):
@@ -87,7 +93,8 @@ class Firebase():
                 parameters[param] = quote('"' + self.buildQuery[param] + '"')
             else:
                 parameters[param] = self.buildQuery[param]
-        request_ref = '{0}{1}.json?{2}'.format(self.fire_base_url, self.child, urlencode(parameters))
+        request_ref = '{0}{1}.json?{2}'.format(self.fire_base_url, self.path, urlencode(parameters))
+        print(request_ref)
         request_object = requests.get(request_ref)
         request_dict = request_object.json()
         # if primitive or simple query return
@@ -133,22 +140,22 @@ class Firebase():
 
         return request_json.keys()
 
-    def post(self, child, data):
-        request_ref = '{0}{1}.json?auth={2}'.format(self.fire_base_url, child, self.token)
+    def post(self, data):
+        request_ref = '{0}{1}.json?auth={2}'.format(self.fire_base_url, self.path, self.token)
         request_object = requests.post(request_ref, data=data)
         return request_object.status_code
 
-    def put(self, child, data):
-        request_ref = '{0}{1}.json?auth={2}'.format(self.fire_base_url, child, self.token)
+    def put(self, data):
+        request_ref = '{0}{1}.json?auth={2}'.format(self.fire_base_url, self.path, self.token)
         request_object = requests.put(request_ref, data=data)
         return request_object.status_code
 
-    def patch(self, child, item_id, data):
-        request_ref = '{0}{1}/{2}.json?auth={3}'.format(self.fire_base_url, child, item_id, self.token)
+    def patch(self, data):
+        request_ref = '{0}{1}.json?auth={3}'.format(self.fire_base_url, self.path, self.token)
         request_object = requests.patch(request_ref, data=data)
         return request_object.status_code
 
-    def delete(self, child):
-        request_ref = '{0}{1}.json?auth={2}'.format(self.fire_base_url, child, self.token)
+    def delete(self):
+        request_ref = '{0}{1}.json?auth={2}'.format(self.fire_base_url, self.path, self.token)
         request_object = requests.delete(request_ref)
         return request_object.status_code
