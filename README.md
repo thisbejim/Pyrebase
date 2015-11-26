@@ -43,45 +43,48 @@ Learn more about your current connection.
 print(user.info['uid']) # -K2QRiOt8oQ5vBYS5mI1
 ```
 
+## Building Paths
+After authenticating a user or admin, you can build paths to your data by using the child() method.
+
+```python
+user.child("users").child("Marty")
+```
 
 ## Saving Data
 
-### POST
+### PUSH
 
-To save data with a unique, auto-generated, timestamp-based key, use the POST method.
+To save data with a unique, auto-generated, timestamp-based key, use the PUSH method.
 
 ```python
-import json
 data = {"name": "Marty Mcfly", "date": "05-11-1955"}
-admin.post("users", json.dumps(data))
+admin.child("users").push(data)
 ```
 
-### PUT
+### SET
 
-To create your own keys use the PUT method. The key in the example below is "Marty".
+To create your own keys use the SET method. The key in the example below is "Marty".
 
 ```python
 import json
 data = {"Marty": {"name": "Marty Mcfly", "date":"05-11-1955"}}
-admin.put("users", json.dumps(data))
+admin.child("users").set(data)
 ```
 
-### PATCH
+### UPDATE
 
-To update data for an existing entry use the PATCH method.
+To update data for an existing entry use the UPDATE method.
 
 ```python
-import json
-data = {"date": "26-10-1985"}
-admin.patch("users", "Marty", json.dumps(data))
+admin.child("users").child("Marty).update({"date": "26-10-1985"})
 ```
 
-### DELETE
+### REMOVE
 
-To delete data for an existing entry use the DELETE method.
+To delete data for an existing entry use the REMOVE method.
 
 ```python
-admin.delete("users/Marty")
+admin.child("users").remove("Marty")
 ```
 
 
@@ -89,29 +92,23 @@ admin.delete("users/Marty")
 
 ### Simple Queries
 
-#### query
+#### get
 
-Takes a database reference, returning all reference data.
-
-```python
-all_users = admin.query("users").get()
-```
-
-To retrieve one entry just expand the path.
+To return data from a path simply call the get() method.
 
 ```python
-one_user = admin.query("users/Marty").get()
-# or:
-one_user = admin.query("users", "Marty").get()
+all_users = admin.child("users").get()
 ```
 
-#### keys
+#### shallow
 
-Takes a database reference, returning all keys beneath that point. This does not get the full tree of data from Firebase.
+To return just the keys at a particular path use the shallow() method.
 
 ```python
-all_user_ids = admin.keys("users")
+all_user_ids = admin.child("users").shallow()
 ```
+
+Note: shallow() can not be used in conjunction with any complex queries.
 
 
 ### Complex Queries
@@ -120,7 +117,7 @@ Queries can be built by chaining multiple query parameters together (in much the
 
 Example:
 ```python
-users_by_name = admin.query("users").orderBy("name").limitToFirst(3).get()
+users_by_name = admin.child("users").orderBy("name").limitToFirst(3).get()
 ```
 This query will return the first three users ordered by name.
 
@@ -130,7 +127,7 @@ We begin any complex query with the orderBy parameter.
 
 Example:
 ```python
-users_by_name = admin.query("users").orderBy("name").get()
+users_by_name = admin.child("users").orderBy("name").get()
 ```
 This query will return users ordered by name.
 
@@ -140,7 +137,7 @@ Return data with a specific value.
 
 Example:
 ```python
-users_by_score = admin.query("users").orderBy("score").equalTo(10).get()
+users_by_score = admin.child("users").orderBy("score").equalTo(10).get()
 ```
 This query will return users with a score of 10.
 
@@ -150,7 +147,7 @@ Specify a range in your data.
 
 Example:
 ```python
-users_by_score = admin.query("users").orderBy("score").startAt(3).endAt(10).get()
+users_by_score = admin.child("users").orderBy("score").startAt(3).endAt(10).get()
 ```
 This query returns users ordered by score and with a score between 3 and 10.
 
@@ -160,18 +157,10 @@ Limits data returned.
 
 Example:
 ```python
-users_by_score = admin.query("users").orderBy("score").limitToFirst(5).get()
+users_by_score = admin.child("users").orderBy("score").limitToFirst(5).get()
 ```
 This query returns the first five users ordered by score.
 
-#### shallow
-
-Fetches only the keys and returns them in a list
-
-Example:
-```python
-user_ids = admin.query("users").shallow().get()
-```
 
 ## Common Errors
 

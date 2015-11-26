@@ -30,6 +30,7 @@ class Firebase():
             request_json = request_object.json()
             self.email = email
             self.password = password
+            print(request_json)
             self.uid = request_json['user']['uid']
             self.token = request_json['token']
         else:
@@ -46,6 +47,34 @@ class Firebase():
         self.secret = fire_base_secret
         self.path = ""
         self.buildQuery = {}
+
+    def create_user(self, email, password):
+        request_ref = 'https://auth.firebase.com/auth/firebase/create?firebase={0}&email={1}&password={2}'.\
+            format(self.fire_base_name, email, password)
+        request_object = requests.get(request_ref)
+        request_json = request_object.json()
+        return request_json
+
+    def remove_user(self, email, password):
+        request_ref = 'https://auth.firebase.com/auth/firebase/remove?firebase={0}&email={1}&password={2}'.\
+            format(self.fire_base_name, email, password)
+        request_object = requests.get(request_ref)
+        request_json = request_object.json()
+        return request_json
+
+    def change_password(self, email, new_password):
+        request_ref = 'https://auth.firebase.com/auth/firebase/update?firebase={0}&email={1}&newPassword={2}'.\
+            format(self.fire_base_name, email, new_password)
+        request_object = requests.get(request_ref)
+        request_json = request_object.json()
+        return request_json
+
+    def send_password_reset_email(self, email, new_password):
+        request_ref = 'https://auth.firebase.com/auth/firebase/reset_password?firebase={0}&email={1}'.\
+            format(self.fire_base_name, email, new_password)
+        request_object = requests.get(request_ref)
+        request_json = request_object.json()
+        return request_json
 
     def orderBy(self, order):
         self.buildQuery["orderBy"] = order
@@ -120,13 +149,6 @@ class Firebase():
                      'uid': self.uid}
         return info_list
 
-    def create(self, email, password):
-        request_ref = 'https://auth.firebase.com/auth/firebase/create?firebase={0}&email={1}&password={2}'.\
-            format(self.fire_base_name, email, password)
-        request_object = requests.get(request_ref)
-        request_json = request_object.json()
-        return request_json
-
     def keys(self, child):
         request_ref = '{0}{1}.json?auth={2}&shallow=true'.\
             format(self.fire_base_url, child, self.token)
@@ -140,22 +162,29 @@ class Firebase():
 
         return request_json.keys()
 
-    def post(self, data):
+    def push(self, data):
         request_ref = '{0}{1}.json?auth={2}'.format(self.fire_base_url, self.path, self.token)
-        request_object = requests.post(request_ref, data=data)
+        request_object = requests.post(request_ref, data=dump(data))
         return request_object.status_code
 
-    def put(self, data):
+    def set(self, data):
         request_ref = '{0}{1}.json?auth={2}'.format(self.fire_base_url, self.path, self.token)
-        request_object = requests.put(request_ref, data=data)
+        request_object = requests.put(request_ref, data=dump(data))
         return request_object.status_code
 
-    def patch(self, data):
+    def update(self, data):
         request_ref = '{0}{1}.json?auth={3}'.format(self.fire_base_url, self.path, self.token)
-        request_object = requests.patch(request_ref, data=data)
+        request_object = requests.patch(request_ref, data=dump(data))
         return request_object.status_code
 
-    def delete(self):
+    def remove(self):
         request_ref = '{0}{1}.json?auth={2}'.format(self.fire_base_url, self.path, self.token)
         request_object = requests.delete(request_ref)
         return request_object.status_code
+
+
+def dump(data):
+    if isinstance(data, dict):
+        return json.dumps(data)
+    else:
+        return data
