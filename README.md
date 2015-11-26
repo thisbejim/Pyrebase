@@ -66,7 +66,6 @@ admin.child("users").push(data)
 To create your own keys use the SET method. The key in the example below is "Marty".
 
 ```python
-import json
 data = {"Marty": {"name": "Marty Mcfly", "date":"05-11-1955"}}
 admin.child("users").set(data)
 ```
