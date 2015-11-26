@@ -94,9 +94,7 @@ admin.child("users").remove("Marty")
 ```
 
 
-## Reading Data
-
-### Simple Queries
+## Simple Queries
 
 #### get
 
@@ -117,7 +115,7 @@ all_user_ids = admin.child("users").shallow().get()
 Note: shallow() can not be used in conjunction with any complex queries.
 
 
-### Complex Queries
+## Complex Queries
 
 Queries can be built by chaining multiple query parameters together.
 
