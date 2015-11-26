@@ -126,15 +126,18 @@ class Firebase():
             else:
                 parameters[param] = self.buildQuery[param]
         request_ref = '{0}{1}.json?{2}'.format(self.fire_base_url, self.path, urlencode(parameters))
-        # reset path for next query
+        # reset path and buildQuery for next query
         self.path = ""
+        buildQuery = self.buildQuery
+        self.buildQuery = {}
+        # do request
         request_object = requests.get(request_ref)
         request_dict = request_object.json()
         # if primitive or simple query return
-        if not isinstance(request_object.json(), dict) or not self.buildQuery:
+        if not isinstance(request_object.json(), dict) or not buildQuery:
             return request_object.json()
         # return keys if shallow is enabled
-        if self.buildQuery and self.buildQuery["shallow"]:
+        if buildQuery.get("shallow"):
             return request_object.json().keys()
         # otherwise sort
         results = []
@@ -142,10 +145,10 @@ class Firebase():
             request_dict[i]["key"] = i
             results.append(request_dict[i])
         # sort if required
-        if self.buildQuery and self.buildQuery["orderBy"]:
-            if self.buildQuery["orderBy"] == "$key":
-                self.buildQuery["orderBy"] = "key"
-            results = sorted(results, key=itemgetter(self.buildQuery["orderBy"]))
+        if buildQuery and buildQuery["orderBy"]:
+            if buildQuery["orderBy"] == "$key":
+                buildQuery["orderBy"] = "key"
+            results = sorted(results, key=itemgetter(buildQuery["orderBy"]))
         return results
 
     def info(self):
