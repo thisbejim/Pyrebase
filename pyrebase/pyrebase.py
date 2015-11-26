@@ -23,6 +23,7 @@ class Firebase():
             db_name = re.search('(.*).firebaseio.com', fire_base_url)
             name = db_name.group(1)
 
+        self.requests = requests.Session()
         self.fire_base_url = url
         self.fire_base_name = name
         self.secret = fire_base_secret
@@ -43,7 +44,7 @@ class Firebase():
     def user(self, email, password):
         request_ref = 'https://auth.firebase.com/auth/firebase?firebase={0}&email={1}&password={2}'.\
             format(self.fire_base_name, email, password)
-        request_object = requests.get(request_ref)
+        request_object = self.requests.get(request_ref)
         request_json = request_object.json()
         self.uid = request_json['user']['uid']
         self.token = request_json['token']
@@ -54,28 +55,28 @@ class Firebase():
     def create_user(self, email, password):
         request_ref = 'https://auth.firebase.com/auth/firebase/create?firebase={0}&email={1}&password={2}'.\
             format(self.fire_base_name, email, password)
-        request_object = requests.get(request_ref)
+        request_object = self.requests.get(request_ref)
         request_json = request_object.json()
         return request_json
 
     def remove_user(self, email, password):
         request_ref = 'https://auth.firebase.com/auth/firebase/remove?firebase={0}&email={1}&password={2}'.\
             format(self.fire_base_name, email, password)
-        request_object = requests.get(request_ref)
+        request_object = self.requests.get(request_ref)
         request_json = request_object.json()
         return request_json
 
     def change_password(self, email, new_password):
         request_ref = 'https://auth.firebase.com/auth/firebase/update?firebase={0}&email={1}&newPassword={2}'.\
             format(self.fire_base_name, email, new_password)
-        request_object = requests.get(request_ref)
+        request_object = self.requests.get(request_ref)
         request_json = request_object.json()
         return request_json
 
     def send_password_reset_email(self, email, new_password):
         request_ref = 'https://auth.firebase.com/auth/firebase/reset_password?firebase={0}&email={1}'.\
             format(self.fire_base_name, email, new_password)
-        request_object = requests.get(request_ref)
+        request_object = self.requests.get(request_ref)
         request_json = request_object.json()
         return request_json
 
@@ -128,7 +129,7 @@ class Firebase():
         request_ref = '{0}{1}.json?{2}'.format(self.fire_base_url, self.path, urlencode(parameters))
         # reset path for next query
         self.path = ""
-        request_object = requests.get(request_ref)
+        request_object = self.requests.get(request_ref)
         request_dict = request_object.json()
         # if primitive or simple query return
         if not isinstance(request_object.json(), dict) or not self.buildQuery:
@@ -155,22 +156,22 @@ class Firebase():
 
     def push(self, data):
         request_ref = '{0}{1}.json?auth={2}'.format(self.fire_base_url, self.path, self.token)
-        request_object = requests.post(request_ref, data=dump(data))
+        request_object = self.requests.post(request_ref, data=dump(data))
         return request_object.status_code
 
     def set(self, data):
         request_ref = '{0}{1}.json?auth={2}'.format(self.fire_base_url, self.path, self.token)
-        request_object = requests.put(request_ref, data=dump(data))
+        request_object = self.requests.put(request_ref, data=dump(data))
         return request_object.status_code
 
     def update(self, data):
         request_ref = '{0}{1}.json?auth={3}'.format(self.fire_base_url, self.path, self.token)
-        request_object = requests.patch(request_ref, data=dump(data))
+        request_object = self.requests.patch(request_ref, data=dump(data))
         return request_object.status_code
 
     def remove(self):
         request_ref = '{0}{1}.json?auth={2}'.format(self.fire_base_url, self.path, self.token)
-        request_object = requests.delete(request_ref)
+        request_object = self.requests.delete(request_ref)
         return request_object.status_code
 
 
