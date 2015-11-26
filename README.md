@@ -119,7 +119,7 @@ Note: shallow() can not be used in conjunction with any complex queries.
 
 ### Complex Queries
 
-Queries can be built by chaining multiple query parameters together (in much the same way as they are in the [javascript library](https://www.firebase.com/docs/web/guide/retrieving-data.html#section-complex-queries)).
+Queries can be built by chaining multiple query parameters together.
 
 Example:
 ```python
