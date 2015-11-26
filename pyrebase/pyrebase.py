@@ -115,7 +115,7 @@ class Firebase():
         else:
             if new_path.startswith("/"):
                 new_path = new_path[1:]
-            self.path += new_path
+            self.path = new_path
         return self
 
     def get(self):
