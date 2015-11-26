@@ -121,7 +121,6 @@ Note: shallow() can not be used in conjunction with any complex queries.
 
 Queries can be built by chaining multiple query parameters together.
 
-Example:
 ```python
 users_by_name = admin.child("users").orderBy("name").limitToFirst(3).get()
 ```
@@ -131,7 +130,6 @@ This query will return the first three users ordered by name.
 
 We begin any complex query with the orderBy parameter.
 
-Example:
 ```python
 users_by_name = admin.child("users").orderBy("name").get()
 ```
@@ -141,7 +139,6 @@ This query will return users ordered by name.
 
 Return data with a specific value.
 
-Example:
 ```python
 users_by_score = admin.child("users").orderBy("score").equalTo(10).get()
 ```
@@ -151,7 +148,6 @@ This query will return users with a score of 10.
 
 Specify a range in your data.
 
-Example:
 ```python
 users_by_score = admin.child("users").orderBy("score").startAt(3).endAt(10).get()
 ```
@@ -161,7 +157,6 @@ This query returns users ordered by score and with a score between 3 and 10.
 
 Limits data returned.
 
-Example:
 ```python
 users_by_score = admin.child("users").orderBy("score").limitToFirst(5).get()
 ```
