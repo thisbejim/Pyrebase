@@ -122,7 +122,6 @@ class Firebase():
             else:
                 parameters[param] = self.buildQuery[param]
         request_ref = '{0}{1}.json?{2}'.format(self.fire_base_url, self.path, urlencode(parameters))
-        print(request_ref)
         request_object = requests.get(request_ref)
         request_dict = request_object.json()
         # if primitive or simple query return
