@@ -104,7 +104,7 @@ all_users = admin.child("users").get()
 To return just the keys at a particular path use the shallow() method.
 
 ```python
-all_user_ids = admin.child("users").shallow()
+all_user_ids = admin.child("users").shallow().get()
 ```
 
 Note: shallow() can not be used in conjunction with any complex queries.

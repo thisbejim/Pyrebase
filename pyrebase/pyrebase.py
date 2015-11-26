@@ -30,7 +30,6 @@ class Firebase():
             request_json = request_object.json()
             self.email = email
             self.password = password
-            print(request_json)
             self.uid = request_json['user']['uid']
             self.token = request_json['token']
         else:
@@ -148,19 +147,6 @@ class Firebase():
         info_list = {'url': self.fire_base_url, 'token': self.token, 'email': self.email, 'password': self.password,
                      'uid': self.uid}
         return info_list
-
-    def keys(self, child):
-        request_ref = '{0}{1}.json?auth={2}&shallow=true'.\
-            format(self.fire_base_url, child, self.token)
-
-        request_object = requests.get(request_ref)
-
-        request_json = request_object.json()
-
-        if request_object.status_code != 200:
-            return request_json
-
-        return request_json.keys()
 
     def push(self, data):
         request_ref = '{0}{1}.json?auth={2}'.format(self.fire_base_url, self.path, self.token)
