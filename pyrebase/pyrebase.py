@@ -1,10 +1,10 @@
 from operator import itemgetter
-from requests_futures.sessions import FuturesSession
+from collections import OrderedDict
+import requests
 from firebase_token_generator import create_token
 from urllib.parse import urlencode, quote
 import re
 import json
-request = FuturesSession()
 
 
 class Firebase():
@@ -26,7 +26,7 @@ class Firebase():
         if email and password:
             request_ref = 'https://auth.firebase.com/auth/firebase?firebase={0}&email={1}&password={2}'.\
                 format(name, email, password)
-            request_object = request.get(request_ref).result()
+            request_object = requests.get(request_ref)
             request_json = request_object.json()
             self.email = email
             self.password = password
@@ -88,12 +88,15 @@ class Firebase():
             else:
                 parameters[param] = self.buildQuery[param]
         request_ref = '{0}{1}.json?{2}'.format(self.fire_base_url, self.child, urlencode(parameters))
-        request_object = request.get(request_ref).result()
-        request_dict = json.loads(str(request_object.text))
-        # if only one result return dict
-        if not isinstance(list(request_dict.values())[0], dict):
-            return request_dict
-        # otherwise place in list
+        request_object = requests.get(request_ref)
+        request_dict = request_object.json()
+        # if primitive or simple query return
+        if not isinstance(request_object.json(), dict) or not self.buildQuery:
+            return request_object.json()
+        # return keys if shallow is enabled
+        if self.buildQuery and self.buildQuery["shallow"]:
+            return request_object.json().keys()
+        # otherwise sort
         results = []
         for i in request_dict:
             request_dict[i]["key"] = i
@@ -103,9 +106,6 @@ class Firebase():
             if self.buildQuery["orderBy"] == "$key":
                 self.buildQuery["orderBy"] = "key"
             results = sorted(results, key=itemgetter(self.buildQuery["orderBy"]))
-        # return keys if shallow is enabled
-        if self.buildQuery and self.buildQuery["shallow"]:
-            return results.keys()
         return results
 
     def info(self):
@@ -116,7 +116,7 @@ class Firebase():
     def create(self, email, password):
         request_ref = 'https://auth.firebase.com/auth/firebase/create?firebase={0}&email={1}&password={2}'.\
             format(self.fire_base_name, email, password)
-        request_object = request.get(request_ref).result()
+        request_object = requests.get(request_ref)
         request_json = request_object.json()
         return request_json
 
@@ -124,7 +124,7 @@ class Firebase():
         request_ref = '{0}{1}.json?auth={2}&shallow=true'.\
             format(self.fire_base_url, child, self.token)
 
-        request_object = request.get(request_ref).result()
+        request_object = requests.get(request_ref)
 
         request_json = request_object.json()
 
@@ -135,20 +135,20 @@ class Firebase():
 
     def post(self, child, data):
         request_ref = '{0}{1}.json?auth={2}'.format(self.fire_base_url, child, self.token)
-        request_object = request.post(request_ref, data=data).result()
+        request_object = requests.post(request_ref, data=data)
         return request_object.status_code
 
     def put(self, child, data):
         request_ref = '{0}{1}.json?auth={2}'.format(self.fire_base_url, child, self.token)
-        request_object = request.put(request_ref, data=data).result()
+        request_object = requests.put(request_ref, data=data)
         return request_object.status_code
 
     def patch(self, child, item_id, data):
         request_ref = '{0}{1}/{2}.json?auth={3}'.format(self.fire_base_url, child, item_id, self.token)
-        request_object = request.patch(request_ref, data=data).result()
+        request_object = requests.patch(request_ref, data=data)
         return request_object.status_code
 
     def delete(self, child):
         request_ref = '{0}{1}.json?auth={2}'.format(self.fire_base_url, child, self.token)
-        request_object = request.delete(request_ref).result()
+        request_object = requests.delete(request_ref)
         return request_object.status_code
