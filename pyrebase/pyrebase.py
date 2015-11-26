@@ -132,13 +132,13 @@ class Firebase():
         buildQuery = self.buildQuery
         self.buildQuery = {}
         # do request
-        request_object = requests.get(request_ref)
+        request_object = self.requests.get(request_ref)
         request_dict = request_object.json()
         # if primitive or simple query return
-        if not isinstance(request_dict, dict) or not self.buildQuery:
+        if not isinstance(request_dict, dict) or not buildQuery:
             return request_dict
         # return keys if shallow is enabled
-        if self.buildQuery and self.buildQuery["shallow"]:
+        if buildQuery.get("shallow"):
             return request_dict.keys()
         # otherwise sort
         results = []
@@ -160,25 +160,25 @@ class Firebase():
     def push(self, data):
         request_ref = '{0}{1}.json?auth={2}'.format(self.fire_base_url, self.path, self.token)
         self.path = ""
-        request_object = requests.post(request_ref, data=dump(data))
+        request_object = self.requests.post(request_ref, data=dump(data))
         return request_object.status_code
 
     def set(self, data):
         request_ref = '{0}{1}.json?auth={2}'.format(self.fire_base_url, self.path, self.token)
         self.path = ""
-        request_object = requests.put(request_ref, data=dump(data))
+        request_object = self.requests.put(request_ref, data=dump(data))
         return request_object.status_code
 
     def update(self, data):
         request_ref = '{0}{1}.json?auth={2}'.format(self.fire_base_url, self.path, self.token)
         self.path = ""
-        request_object = requests.patch(request_ref, data=dump(data))
+        request_object = self.requests.patch(request_ref, data=dump(data))
         return request_object.status_code
 
     def remove(self):
         request_ref = '{0}{1}.json?auth={2}'.format(self.fire_base_url, self.path, self.token)
         self.path = ""
-        request_object = requests.delete(request_ref)
+        request_object = self.requests.delete(request_ref)
         return request_object.status_code
 
 
