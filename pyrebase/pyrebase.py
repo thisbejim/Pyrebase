@@ -135,11 +135,11 @@ class Firebase():
         request_object = requests.get(request_ref)
         request_dict = request_object.json()
         # if primitive or simple query return
-        if not isinstance(request_object.json(), dict) or not buildQuery:
-            return request_object.json()
+        if not isinstance(request_dict, dict) or not self.buildQuery:
+            return request_dict
         # return keys if shallow is enabled
-        if buildQuery.get("shallow"):
-            return request_object.json().keys()
+        if self.buildQuery and self.buildQuery["shallow"]:
+            return request_dict.keys()
         # otherwise sort
         results = []
         for i in request_dict:
