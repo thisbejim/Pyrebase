@@ -11,37 +11,44 @@ pip install pyrebase
 
 ## Initialising your Firebase
 
+```python
+ref = pyrebase.Firebase('https://yourfirebaseurl.firebaseio.com', 'yourfirebasesecret')
+```
+
+## Authentication
+
 ### Admin
 
 Authenticating as an admin will disregard your security rules.
 
 ```python
-admin = pyrebase.Firebase('https://yourfirebaseurl.firebaseio.com', 'yourfirebasesecret')
+admin = ref.admin()
 ```
 
-### Users
+### User
 
-#### Creating new users
+Authenticating as a user will adhere to your security rules.
 
 ```python
-new_user_info = admin.create('email', 'password')
+user = ref.user("email", "password")
 ```
 
-#### Authenticate a user
-
-Initialise your Firebase with an additional email and password. Security rules apply to this connection type.
-
-```python
-user = pyrebase.Firebase('https://yourfirebaseurl.firebaseio.com', 'yourfirebasesecret', 'email', 'password')
-```
-
-### Connection Info
+### Connection Information
 
 Learn more about your current connection.
 
 ```python
-print(user.info['uid']) # -K2QRiOt8oQ5vBYS5mI1
+print(user.info)
 ```
+
+## User Management
+
+### Creating new users
+
+```python
+admin.create_user("email", "password")
+```
+Note: Make sure you have Email & Password Authentication enabled on your firebase dashboard under Login & Auth.
 
 ## Building Paths
 After authenticating a user or admin, you can build paths to your data by using the child() method.
