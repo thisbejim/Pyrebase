@@ -82,7 +82,7 @@ admin.child("users").set(data)
 To update data for an existing entry use the UPDATE method.
 
 ```python
-admin.child("users").child("Marty).update({"date": "26-10-1985"})
+admin.child("users").child("Marty").update({"date": "26-10-1985"})
 ```
 
 ### REMOVE
@@ -90,7 +90,7 @@ admin.child("users").child("Marty).update({"date": "26-10-1985"})
 To delete data for an existing entry use the REMOVE method.
 
 ```python
-admin.child("users").remove("Marty")
+admin.child("users").child("Marty").remove()
 ```
 
 
