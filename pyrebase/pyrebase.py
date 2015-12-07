@@ -135,7 +135,7 @@ class Firebase():
         request_object = self.requests.get(request_ref)
         # return if error
         if request_object.status_code != 200:
-            return request_object.status_code
+            return None
         request_dict = request_object.json()
         # if primitive or simple query return
         if not isinstance(request_dict, dict) or not buildQuery:
