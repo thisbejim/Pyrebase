@@ -133,6 +133,9 @@ class Firebase():
         self.buildQuery = {}
         # do request
         request_object = self.requests.get(request_ref)
+        # return if error
+        if request_object.status_code != 200:
+            return request_object.status_code
         request_dict = request_object.json()
         # if primitive or simple query return
         if not isinstance(request_dict, dict) or not buildQuery:
@@ -142,13 +145,12 @@ class Firebase():
             return request_dict.keys()
         # otherwise sort
         results = []
-        for i in request_dict:
-            request_dict[i]["key"] = i
-            results.append(request_dict[i])
-        # sort if required
         if buildQuery.get("orderBy"):
             if buildQuery["orderBy"] == "$key":
                 buildQuery["orderBy"] = "key"
+                for i in request_dict:
+                    request_dict[i]["key"] = i
+                    results.append(request_dict[i])
             results = sorted(results, key=itemgetter(buildQuery["orderBy"]))
         return results
 
