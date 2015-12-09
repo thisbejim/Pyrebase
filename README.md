@@ -85,7 +85,7 @@ To update data for an existing entry use the UPDATE method.
 admin.child("users").child("Marty").update({"date": "26-10-1985"})
 ```
 
-You can also perform [multi-location updates](https://www.firebase.com/blog/2015-09-24-atomic-writes-and-more.html) with the update method.
+You can also perform [multi-location updates](https://www.firebase.com/blog/2015-09-24-atomic-writes-and-more.html).
 
 ```python
 data = {
