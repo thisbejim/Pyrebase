@@ -85,7 +85,17 @@ To update data for an existing entry use the UPDATE method.
 admin.child("users").child("Marty").update({"date": "26-10-1985"})
 ```
 
-You can also perform [multi-location updates](https://www.firebase.com/blog/2015-09-24-atomic-writes-and-more.html).
+### REMOVE
+
+To delete data for an existing entry use the REMOVE method.
+
+```python
+admin.child("users").child("Marty").remove()
+```
+
+### MULTI-LOCATION UPDATES
+
+You can also perform [multi-location updates](https://www.firebase.com/blog/2015-09-24-atomic-writes-and-more.html) with the update method.
 
 ```python
 data = {
@@ -100,14 +110,26 @@ data = {
 admin.update(data)
 ```
 
-### REMOVE
-
-To delete data for an existing entry use the REMOVE method.
+To perform multi-location writes to new locations with auto-generated keys we must combine the PUSH and UPDATE methods.
+First push some dummy data then use the returned keys to perform multi-location writes.
 
 ```python
-admin.child("users").child("Marty").remove()
-```
+first_key = admin.child("users").push({"newKey": "retrieve"})
+second_key = admin.child("users").push({"newKey": "retrieve"})
 
+data = {
+    "users/"+first_key["name"]: {
+        "date": "26-10-1985",
+        "newKey": None
+    },
+    "users/"+second_key["name"]: {
+        "date": "26-10-1985",
+        "newKey": None
+    }
+}
+
+admin.update(data)
+```
 
 ## Simple Queries
 

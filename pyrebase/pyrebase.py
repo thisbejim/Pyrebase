@@ -164,25 +164,25 @@ class Firebase():
         request_ref = '{0}{1}.json?auth={2}'.format(self.fire_base_url, self.path, self.token)
         self.path = ""
         request_object = self.requests.post(request_ref, data=dump(data))
-        return request_object.status_code
+        return request_object.json()
 
     def set(self, data):
         request_ref = '{0}{1}.json?auth={2}'.format(self.fire_base_url, self.path, self.token)
         self.path = ""
         request_object = self.requests.put(request_ref, data=dump(data))
-        return request_object.status_code
+        return request_object.json()
 
     def update(self, data):
         request_ref = '{0}{1}.json?auth={2}'.format(self.fire_base_url, self.path, self.token)
         self.path = ""
         request_object = self.requests.patch(request_ref, data=dump(data))
-        return request_object.status_code
+        return request_object.json()
 
     def remove(self):
         request_ref = '{0}{1}.json?auth={2}'.format(self.fire_base_url, self.path, self.token)
         self.path = ""
         request_object = self.requests.delete(request_ref)
-        return request_object.status_code
+        return request_object.json()
 
 
 def dump(data):
