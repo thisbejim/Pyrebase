@@ -1,5 +1,6 @@
 from operator import itemgetter
 import requests
+from requests.exceptions import HTTPError
 from firebase_token_generator import create_token
 from urllib.parse import urlencode, quote
 import re
@@ -133,8 +134,11 @@ class Firebase():
         # do request
         request_object = self.requests.get(request_ref)
         # return if error
-        if request_object.status_code != 200:
-            return {"error": request_object.text, "status_code": request_object.status_code}
+        try:
+            request_object.raise_for_status()
+        except HTTPError as e:
+            raise HTTPError(e, request_object.text)
+
         request_dict = request_object.json()
         # if primitive or simple query return
         if not isinstance(request_dict, dict):
