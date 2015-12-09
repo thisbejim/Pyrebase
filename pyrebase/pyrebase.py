@@ -137,8 +137,10 @@ class Firebase():
             return {"error": request_object.text, "status_code": request_object.status_code}
         request_dict = request_object.json()
         # if primitive or simple query return
-        if not isinstance(request_dict, dict) or not buildQuery:
+        if not isinstance(request_dict, dict):
             return request_dict
+        if not buildQuery:
+            return request_dict.values()
         # return keys if shallow is enabled
         if buildQuery.get("shallow"):
             return request_dict.keys()
