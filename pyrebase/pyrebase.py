@@ -1,5 +1,4 @@
 from operator import itemgetter
-from collections import OrderedDict
 import requests
 from firebase_token_generator import create_token
 from urllib.parse import urlencode, quote
@@ -135,7 +134,7 @@ class Firebase():
         request_object = self.requests.get(request_ref)
         # return if error
         if request_object.status_code != 200:
-            return None
+            return {"error": request_object.text, "status_code": request_object.status_code}
         request_dict = request_object.json()
         # if primitive or simple query return
         if not isinstance(request_dict, dict) or not buildQuery:
@@ -144,15 +143,11 @@ class Firebase():
         if buildQuery.get("shallow"):
             return request_dict.keys()
         # otherwise sort
-        results = []
         if buildQuery.get("orderBy"):
-            if buildQuery["orderBy"] == "$key":
-                buildQuery["orderBy"] = "key"
-                for i in request_dict:
-                    request_dict[i]["key"] = i
-                    results.append(request_dict[i])
-            results = sorted(results, key=itemgetter(buildQuery["orderBy"]))
-        return results
+            if buildQuery["orderBy"] in ["$key", "key"]:
+                return sorted(list(request_dict))
+            else:
+                return sorted(request_dict.values(), key=itemgetter(buildQuery["orderBy"]))
 
     def info(self):
         info_list = {'url': self.fire_base_url, 'token': self.token, 'email': self.email, 'password': self.password,
