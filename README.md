@@ -1,4 +1,4 @@
-# [Pyrebase](https://pypi.python.org/pypi/Pyrebase)
+# Pyrebase [![PyPI version](https://badge.fury.io/py/Pyrebase.svg)](https://badge.fury.io/py/Pyrebase)
 
 A simple python wrapper for the [Firebase API](https://www.firebase.com/docs/rest/guide/).
 
