@@ -61,29 +61,30 @@ class Firebase():
         request_ref = 'https://auth.firebase.com/auth/firebase/create?firebase={0}&email={1}&password={2}'.\
             format(self.fire_base_name, email, password)
         request_object = self.requests.get(request_ref)
-        request_json = request_object.json()
-        return request_json
+        request_object.raise_for_status()
+        return request_object.json()
 
     def remove_user(self, email, password):
         request_ref = 'https://auth.firebase.com/auth/firebase/remove?firebase={0}&email={1}&password={2}'.\
             format(self.fire_base_name, email, password)
         request_object = self.requests.get(request_ref)
-        request_json = request_object.json()
-        return request_json
+        request_object.raise_for_status()
+        return request_object.json()
 
-    def change_password(self, email, new_password):
-        request_ref = 'https://auth.firebase.com/auth/firebase/update?firebase={0}&email={1}&newPassword={2}'.\
-            format(self.fire_base_name, email, new_password)
+    def change_password(self, email, old_password, new_password):
+        request_ref = 'https://auth.firebase.com/auth/firebase/update?' \
+                      'firebase={0}&email={1}&oldPassword={2}&newPassword={3}'.\
+            format(self.fire_base_name, email, old_password, new_password)
         request_object = self.requests.get(request_ref)
-        request_json = request_object.json()
-        return request_json
+        request_object.raise_for_status()
+        return request_object.json()
 
-    def send_password_reset_email(self, email, new_password):
+    def send_password_reset_email(self, email):
         request_ref = 'https://auth.firebase.com/auth/firebase/reset_password?firebase={0}&email={1}'.\
-            format(self.fire_base_name, email, new_password)
+            format(self.fire_base_name, email)
         request_object = self.requests.get(request_ref)
-        request_json = request_object.json()
-        return request_json
+        request_object.raise_for_status()
+        return request_object.json()
 
     def orderBy(self, order):
         self.buildQuery["orderBy"] = order

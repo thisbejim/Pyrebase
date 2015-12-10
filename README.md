@@ -43,12 +43,31 @@ print(user.info)
 
 ## User Management
 
-### Creating new users
+### Creating users
 
 ```python
 admin.create_user("email", "password")
 ```
 Note: Make sure you have Email & Password Authentication enabled on your firebase dashboard under Login & Auth.
+
+### Removing users
+
+```python
+admin.remove_user("email", "password")
+```
+
+### Changing user passwords
+
+```python
+admin.change_password("email", "old_password", "new_password")
+```
+
+### Sending password reset emails
+
+```python
+admin.send_password_reset_email("email")
+```
+
 
 ## Building Paths
 After authenticating a user or admin, you can build paths to your data by using the child() method.
