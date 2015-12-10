@@ -5,6 +5,9 @@ from firebase_token_generator import create_token
 from urllib.parse import urlencode, quote
 import re
 import json
+import math
+from random import uniform
+import time
 
 
 class Firebase():
@@ -33,6 +36,8 @@ class Firebase():
         self.password = None
         self.path = ""
         self.buildQuery = {}
+        self.last_push_time = 0
+        self.last_rand_chars = []
 
     def admin(self):
         auth_payload = {"uid": "1"}
@@ -183,6 +188,28 @@ class Firebase():
         self.path = ""
         request_object = self.requests.delete(request_ref)
         return request_object.json()
+
+    def generate_key(self):
+        PUSH_CHARS = '-0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz'
+        now = int(time.time() * 1000)
+        duplicate_time = now == self.last_push_time
+        self.last_push_time = now
+        time_stamp_chars = [0] * 8
+        for i in reversed(range(0, 8)):
+            time_stamp_chars[i] = PUSH_CHARS[now % 64]
+            now = math.floor(now / 64)
+        id = "".join(time_stamp_chars)
+        if not duplicate_time:
+            for i in range(0, 12):
+                self.last_rand_chars.append(math.floor(uniform(0, 1) * 64))
+        else:
+            for i in range(0, 11):
+                if self.last_rand_chars[i] == 63:
+                    self.last_rand_chars[i] = 0
+                self.last_rand_chars[i] += 1
+        for i in range(0, 12):
+            id += PUSH_CHARS[self.last_rand_chars[i]]
+        return id
 
 
 def dump(data):

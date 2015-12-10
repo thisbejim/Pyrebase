@@ -110,21 +110,17 @@ data = {
 admin.update(data)
 ```
 
-To perform multi-location writes to new locations with auto-generated keys we must combine the PUSH and UPDATE methods.
-First push some dummy data then use the returned keys to perform multi-location writes.
+To perform multi-location writes to new locations with auto-generated keys we can use the generate_key() method.
 
 ```python
-first_key = admin.child("users").push({"newKey": "retrieve"})
-second_key = admin.child("users").push({"newKey": "retrieve"})
-
 data = {
-    "users/"+first_key["name"]: {
+    "users/"+admin.generate_key(): {
         "date": "26-10-1985",
-        "newKey": None
+        "new_key": None
     },
-    "users/"+second_key["name"]: {
+    "users/"+admin.generate_key(): {
         "date": "26-10-1985",
-        "newKey": None
+        "new_key": None
     }
 }
 
