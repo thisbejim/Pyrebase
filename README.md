@@ -41,6 +41,7 @@ Learn more about your current connection.
 print(user.info)
 ```
 
+
 ## User Management
 
 ### Creating users

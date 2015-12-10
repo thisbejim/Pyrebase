@@ -199,7 +199,7 @@ class Firebase():
         for i in reversed(range(0, 8)):
             time_stamp_chars[i] = PUSH_CHARS[now % 64]
             now = math.floor(now / 64)
-        id = "".join(time_stamp_chars)
+        new_id = "".join(time_stamp_chars)
         if not duplicate_time:
             for i in range(0, 12):
                 self.last_rand_chars.append(math.floor(uniform(0, 1) * 64))
@@ -209,8 +209,8 @@ class Firebase():
                     self.last_rand_chars[i] = 0
                 self.last_rand_chars[i] += 1
         for i in range(0, 12):
-            id += PUSH_CHARS[self.last_rand_chars[i]]
-        return id
+            new_id += PUSH_CHARS[self.last_rand_chars[i]]
+        return new_id
 
 
 def dump(data):
