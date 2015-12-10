@@ -115,12 +115,10 @@ To perform multi-location writes to new locations with auto-generated keys we ca
 ```python
 data = {
     "users/"+admin.generate_key(): {
-        "date": "26-10-1985",
-        "new_key": None
+        "date": "26-10-1985"
     },
     "users/"+admin.generate_key(): {
-        "date": "26-10-1985",
-        "new_key": None
+        "date": "26-10-1985"
     }
 }
 
