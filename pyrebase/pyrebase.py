@@ -134,7 +134,7 @@ class Firebase():
 
         request_dict = request_object.json()
         # if primitive or simple query return
-        if not isinstance(request_dict, dict):
+        if not isinstance(request_dict, dict) or not isinstance(list(request_dict.values())[0], dict):
             return request_dict
         if not buildQuery:
             return request_dict.values()
