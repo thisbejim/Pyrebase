@@ -206,7 +206,7 @@ ref.sendPasswordResetEmail("email")
 
 ### generateKey
 
-generateKey is an implementation of Firebase's [key generation algorithm](https://www.firebase.com/blog/2015-02-11-firebase-unique-identifiers.html).
+generateKey() is an implementation of Firebase's [key generation algorithm](https://www.firebase.com/blog/2015-02-11-firebase-unique-identifiers.html).
 
 See multi-location updates for a potential use case.
 
@@ -215,7 +215,7 @@ See multi-location updates for a potential use case.
 Sometimes we might want to sort our data multiple times. For example, we might want to retrieve all articles written between a
 certain date then sort those articles based on the number of likes.
 
-Currently the REST API only allows us to sort our data once, so the reSort method bridges this gap.
+Currently the REST API only allows us to sort our data once, so the reSort() method bridges this gap.
 
 ```python
 articles = ref.child("articles").orderBy("date").startAt(startDate).endAt(endDate).get()
