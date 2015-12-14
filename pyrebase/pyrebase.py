@@ -17,7 +17,6 @@ class Firebase():
             url = ''.join([fire_base_url, '/'])
         else:
             url = fire_base_url
-
         # find db name between http:// and .firebaseio.com
         db_name = re.search('https://(.*).firebaseio.com', fire_base_url)
         if db_name:
@@ -25,53 +24,41 @@ class Firebase():
         else:
             db_name = re.search('(.*).firebaseio.com', fire_base_url)
             name = db_name.group(1)
+        # default to admin
+        auth_payload = {"uid": "1"}
+        options = {"admin": True}
 
+        self.token = create_token(fire_base_secret, auth_payload, options)
         self.requests = requests.Session()
         self.fire_base_url = url
         self.fire_base_name = name
         self.secret = fire_base_secret
-        self.token = None
-        self.uid = None
-        self.email = None
-        self.password = None
         self.path = ""
         self.buildQuery = {}
         self.last_push_time = 0
         self.last_rand_chars = []
 
-    def admin(self):
-        auth_payload = {"uid": "1"}
-        options = {"admin": True}
-        token = create_token(self.secret, auth_payload, options)
-        self.token = token
-        return self
-
-    def user(self, email, password):
+    def authWithPassword(self, email, password):
         request_ref = 'https://auth.firebase.com/auth/firebase?firebase={0}&email={1}&password={2}'.\
             format(self.fire_base_name, email, password)
         request_object = self.requests.get(request_ref)
-        request_json = request_object.json()
-        self.uid = request_json['user']['uid']
-        self.token = request_json['token']
-        self.email = email
-        self.password = password
-        return self
+        return request_object.json()
 
-    def create_user(self, email, password):
+    def createUser(self, email, password):
         request_ref = 'https://auth.firebase.com/auth/firebase/create?firebase={0}&email={1}&password={2}'.\
             format(self.fire_base_name, email, password)
         request_object = self.requests.get(request_ref)
         request_object.raise_for_status()
         return request_object.json()
 
-    def remove_user(self, email, password):
+    def removeUser(self, email, password):
         request_ref = 'https://auth.firebase.com/auth/firebase/remove?firebase={0}&email={1}&password={2}'.\
             format(self.fire_base_name, email, password)
         request_object = self.requests.get(request_ref)
         request_object.raise_for_status()
         return request_object.json()
 
-    def change_password(self, email, old_password, new_password):
+    def changePassword(self, email, old_password, new_password):
         request_ref = 'https://auth.firebase.com/auth/firebase/update?' \
                       'firebase={0}&email={1}&oldPassword={2}&newPassword={3}'.\
             format(self.fire_base_name, email, old_password, new_password)
@@ -79,7 +66,7 @@ class Firebase():
         request_object.raise_for_status()
         return request_object.json()
 
-    def send_password_reset_email(self, email):
+    def sendPasswordResetEmail(self, email):
         request_ref = 'https://auth.firebase.com/auth/firebase/reset_password?firebase={0}&email={1}'.\
             format(self.fire_base_name, email)
         request_object = self.requests.get(request_ref)
@@ -124,9 +111,9 @@ class Firebase():
             self.path = new_path
         return self
 
-    def get(self):
+    def get(self, token=None):
         parameters = {}
-        parameters['auth'] = self.token
+        parameters['auth'] = check_token(token, self.token)
         for param in list(self.buildQuery):
             if type(self.buildQuery[param]) is str:
                 parameters[param] = quote('"' + self.buildQuery[param] + '"')
@@ -161,36 +148,35 @@ class Firebase():
             else:
                 return sorted(request_dict.values(), key=itemgetter(buildQuery["orderBy"]))
 
-    def info(self):
-        info_list = {'url': self.fire_base_url, 'token': self.token, 'email': self.email, 'password': self.password,
-                     'uid': self.uid}
-        return info_list
-
-    def push(self, data):
-        request_ref = '{0}{1}.json?auth={2}'.format(self.fire_base_url, self.path, self.token)
+    def push(self, data, token=None):
+        request_token = check_token(token, self.token)
+        request_ref = '{0}{1}.json?auth={2}'.format(self.fire_base_url, self.path, request_token)
         self.path = ""
         request_object = self.requests.post(request_ref, data=dump(data))
         return request_object.json()
 
-    def set(self, data):
-        request_ref = '{0}{1}.json?auth={2}'.format(self.fire_base_url, self.path, self.token)
+    def set(self, data, token=None):
+        request_token = check_token(token, self.token)
+        request_ref = '{0}{1}.json?auth={2}'.format(self.fire_base_url, self.path, request_token)
         self.path = ""
         request_object = self.requests.put(request_ref, data=dump(data))
         return request_object.json()
 
-    def update(self, data):
-        request_ref = '{0}{1}.json?auth={2}'.format(self.fire_base_url, self.path, self.token)
+    def update(self, data, token=None):
+        request_token = check_token(token, self.token)
+        request_ref = '{0}{1}.json?auth={2}'.format(self.fire_base_url, self.path, request_token)
         self.path = ""
         request_object = self.requests.patch(request_ref, data=dump(data))
         return request_object.json()
 
-    def remove(self):
-        request_ref = '{0}{1}.json?auth={2}'.format(self.fire_base_url, self.path, self.token)
+    def remove(self, token=None):
+        request_token = check_token(token, self.token)
+        request_ref = '{0}{1}.json?auth={2}'.format(self.fire_base_url, self.path, request_token)
         self.path = ""
         request_object = self.requests.delete(request_ref)
         return request_object.json()
 
-    def generate_key(self):
+    def generateKey(self):
         PUSH_CHARS = '-0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz'
         now = int(time.time() * 1000)
         duplicate_time = now == self.last_push_time
@@ -212,9 +198,19 @@ class Firebase():
             new_id += PUSH_CHARS[self.last_rand_chars[i]]
         return new_id
 
+    def reSort(self, data, by_key):
+        return sorted(data, key=itemgetter(by_key))
+
 
 def dump(data):
     if isinstance(data, dict):
         return json.dumps(data)
     else:
         return data
+
+
+def check_token(user_token, admin_token):
+    if user_token:
+        return user_token
+    else:
+        return admin_token
