@@ -152,21 +152,21 @@ class Firebase():
         request_token = check_token(token, self.token)
         request_ref = '{0}{1}.json?auth={2}'.format(self.fire_base_url, self.path, request_token)
         self.path = ""
-        request_object = self.requests.post(request_ref, data=dump(data))
+        request_object = self.requests.post(request_ref, data=json.dumps(data))
         return request_object.json()
 
     def set(self, data, token=None):
         request_token = check_token(token, self.token)
         request_ref = '{0}{1}.json?auth={2}'.format(self.fire_base_url, self.path, request_token)
         self.path = ""
-        request_object = self.requests.put(request_ref, data=dump(data))
+        request_object = self.requests.put(request_ref, data=json.dumps(data))
         return request_object.json()
 
     def update(self, data, token=None):
         request_token = check_token(token, self.token)
         request_ref = '{0}{1}.json?auth={2}'.format(self.fire_base_url, self.path, request_token)
         self.path = ""
-        request_object = self.requests.patch(request_ref, data=dump(data))
+        request_object = self.requests.patch(request_ref, data=json.dumps(data))
         return request_object.json()
 
     def remove(self, token=None):
@@ -198,15 +198,8 @@ class Firebase():
             new_id += PUSH_CHARS[self.last_rand_chars[i]]
         return new_id
 
-    def reSort(self, data, by_key):
+    def sort(self, data, by_key):
         return sorted(data, key=itemgetter(by_key))
-
-
-def dump(data):
-    if isinstance(data, dict):
-        return json.dumps(data)
-    else:
-        return data
 
 
 def check_token(user_token, admin_token):
