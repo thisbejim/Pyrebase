@@ -42,7 +42,7 @@ ref.child("users").child("Marty")
 
 ## Saving Data
 
-### PUSH
+#### Push
 
 To save data with a unique, auto-generated, timestamp-based key, use the PUSH method.
 
@@ -51,7 +51,7 @@ data = {"name": "Marty Mcfly", "date": "05-11-1955"}
 ref.child("users").push(data)
 ```
 
-### SET
+#### Set
 
 To create your own keys use the SET method. The key in the example below is "Marty".
 
@@ -60,7 +60,7 @@ data = {"Marty": {"name": "Marty Mcfly", "date":"05-11-1955"}}
 ref.child("users").set(data)
 ```
 
-### UPDATE
+#### Update
 
 To update data for an existing entry use the UPDATE method.
 
@@ -68,7 +68,7 @@ To update data for an existing entry use the UPDATE method.
 ref.child("users").child("Marty").update({"date": "26-10-1985"})
 ```
 
-### REMOVE
+#### Remove
 
 To delete data for an existing entry use the REMOVE method.
 
@@ -108,7 +108,33 @@ data = {
 ref.update(data)
 ```
 
-## Simple Queries
+## Queries
+
+### val()
+Queries return a PyreResponse object. Calling ```val()``` on these objects returns the query data.
+
+```
+users = ref.child("users").get()
+print(users.val()) # {"Marty": {"name": "Marty", "date": "26-10-1985"}, "Doc": {"name": "Doc", "date": "01-01-1885"}}
+```
+
+### key()
+Calling ```key()``` returns the key for the query data.
+
+```
+user = ref.child("users").get()
+print(user.key()) # users
+```
+
+### each()
+Returns a list of objects on which you can call ```val()``` and ```key()```.
+
+```
+all_users = ref.child("users").get()
+for user in all_users.each():
+    print(user.key()) # Marty
+    print(user.val()) # {name": "Marty", "date": "26-10-1985"}
+```
 
 #### get
 
@@ -134,16 +160,16 @@ Note: shallow() can not be used in conjunction with any complex queries.
 Queries can be built by chaining multiple query parameters together.
 
 ```python
-users_by_name = ref.child("users").orderBy("name").limitToFirst(3).get()
+users_by_name = ref.child("users").orderByChild("name").limitToFirst(3).get()
 ```
 This query will return the first three users ordered by name.
 
-#### orderBy
+#### orderByChild
 
-We begin any complex query with the orderBy parameter.
+We begin any complex query with the orderByChild parameter.
 
 ```python
-users_by_name = ref.child("users").orderBy("name").get()
+users_by_name = ref.child("users").orderByChild("name").get()
 ```
 This query will return users ordered by name.
 
@@ -152,7 +178,7 @@ This query will return users ordered by name.
 Return data with a specific value.
 
 ```python
-users_by_score = ref.child("users").orderBy("score").equalTo(10).get()
+users_by_score = ref.child("users").orderByChild("score").equalTo(10).get()
 ```
 This query will return users with a score of 10.
 
@@ -161,7 +187,7 @@ This query will return users with a score of 10.
 Specify a range in your data.
 
 ```python
-users_by_score = ref.child("users").orderBy("score").startAt(3).endAt(10).get()
+users_by_score = ref.child("users").orderByChild("score").startAt(3).endAt(10).get()
 ```
 This query returns users ordered by score and with a score between 3 and 10.
 
@@ -170,7 +196,7 @@ This query returns users ordered by score and with a score between 3 and 10.
 Limits data returned.
 
 ```python
-users_by_score = ref.child("users").orderBy("score").limitToFirst(5).get()
+users_by_score = ref.child("users").orderByChild("score").limitToFirst(5).get()
 ```
 This query returns the first five users ordered by score.
 
@@ -218,7 +244,7 @@ certain date then sort those articles based on the number of likes.
 Currently the REST API only allows us to sort our data once, so the sort() method bridges this gap.
 
 ```python
-articles = ref.child("articles").orderBy("date").startAt(startDate).endAt(endDate).get()
+articles = ref.child("articles").orderByChild("date").startAt(startDate).endAt(endDate).get()
 articles_by_likes = ref.sort(articles, "likes")
 ```
 

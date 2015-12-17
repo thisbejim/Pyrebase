@@ -8,6 +8,7 @@ import json
 import math
 from random import uniform
 import time
+from collections import OrderedDict
 
 
 class Firebase():
@@ -73,7 +74,7 @@ class Firebase():
         request_object.raise_for_status()
         return request_object.json()
 
-    def orderBy(self, order):
+    def orderByChild(self, order):
         self.buildQuery["orderBy"] = order
         return self
 
@@ -121,6 +122,7 @@ class Firebase():
                 parameters[param] = self.buildQuery[param]
         request_ref = '{0}{1}.json?{2}'.format(self.fire_base_url, self.path, urlencode(parameters))
         # reset path and buildQuery for next query
+        query_key = self.path.split("/")[-1]
         self.path = ""
         buildQuery = self.buildQuery
         self.buildQuery = {}
@@ -134,19 +136,21 @@ class Firebase():
 
         request_dict = request_object.json()
         # if primitive or simple query return
-        if not isinstance(request_dict, dict) or not isinstance(list(request_dict.values())[0], dict):
-            return request_dict
+        if not isinstance(request_dict, dict):
+            return PyreResponse(request_dict, query_key)
         if not buildQuery:
-            return request_dict.values()
+            return PyreResponse(convert_to_pyre(request_dict.items()), query_key)
         # return keys if shallow is enabled
         if buildQuery.get("shallow"):
-            return request_dict.keys()
+            return PyreResponse(request_dict.keys(), query_key)
         # otherwise sort
+        sorted_response = None
         if buildQuery.get("orderBy"):
-            if buildQuery["orderBy"] in ["$key", "key"]:
-                return sorted(list(request_dict))
+            if buildQuery["orderBy"] == "$key":
+                sorted_response = sorted(request_dict.items(), key=lambda item: item[0])
             else:
-                return sorted(request_dict.values(), key=itemgetter(buildQuery["orderBy"]))
+                sorted_response = sorted(request_dict.items(), key=lambda item: item[1][buildQuery["orderBy"]])
+        return PyreResponse(convert_to_pyre(sorted_response), query_key)
 
     def push(self, data, token=None):
         request_token = check_token(token, self.token)
@@ -198,8 +202,55 @@ class Firebase():
             new_id += PUSH_CHARS[self.last_rand_chars[i]]
         return new_id
 
-    def sort(self, data, by_key):
-        return sorted(data, key=itemgetter(by_key))
+    def sort(self, origin, by_key):
+        # unpack pyre objects
+        pyres = origin.each()
+        new_list = []
+        for pyre in pyres:
+            new_list.append(pyre.item)
+        # sort
+        data = sorted(dict(new_list).items(), key=lambda item: item[1][by_key])
+        return PyreResponse(convert_to_pyre(data), origin.key())
+
+
+def convert_to_pyre(items):
+    pyre_list = []
+    for item in items:
+        pyre_list.append(Pyre(item))
+    return pyre_list
+
+
+class PyreResponse:
+    def __init__(self, pyres, query_key):
+        self.pyres = pyres
+        self.query_key = query_key
+
+    def val(self):
+        if isinstance(self.pyres, list):
+            pyre_list = []
+            for pyre in self.pyres:
+                pyre_list.append((pyre.key(), pyre.val()))
+            return OrderedDict(pyre_list)
+        else:
+            return self.pyres
+
+    def key(self):
+        return self.query_key
+
+    def each(self):
+        if isinstance(self.pyres, list):
+            return self.pyres
+
+
+class Pyre:
+    def __init__(self, item):
+        self.item = item
+
+    def val(self):
+        return self.item[1]
+
+    def key(self):
+        return self.item[0]
 
 
 def check_token(user_token, admin_token):
