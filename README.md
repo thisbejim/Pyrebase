@@ -136,7 +136,7 @@ for user in all_users.each():
     print(user.val()) # {name": "Marty", "date": "26-10-1985"}
 ```
 
-#### get
+#### get()
 
 To return data from a path simply call the get() method.
 
@@ -144,7 +144,7 @@ To return data from a path simply call the get() method.
 all_users = ref.child("users").get()
 ```
 
-#### shallow
+#### shallow()
 
 To return just the keys at a particular path use the shallow() method.
 
