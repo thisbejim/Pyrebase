@@ -19,9 +19,9 @@ ref = pyrebase.Firebase('https://yourfirebaseurl.firebaseio.com', 'yourfirebases
 
 Pyrebase will authenticate as an admin by default, disregarding [security rules](https://www.firebase.com/docs/security/guide/).
 
-### authWithPassword
+### auth_with_password
 
-The authWithPassword method will return user data including a token you can use to adhere to security rules.
+The auth_with_password method will return user data including a token you can use to adhere to security rules.
 
 Each of the following methods accepts an optional user token: get(), push(), set(), update(), and remove().
 
@@ -42,7 +42,7 @@ ref.child("users").child("Marty")
 
 ## Saving Data
 
-#### Push
+#### push
 
 To save data with a unique, auto-generated, timestamp-based key, use the PUSH method.
 
@@ -51,7 +51,7 @@ data = {"name": "Marty Mcfly", "date": "05-11-1955"}
 ref.child("users").push(data)
 ```
 
-#### Set
+#### set
 
 To create your own keys use the SET method. The key in the example below is "Marty".
 
@@ -60,7 +60,7 @@ data = {"Marty": {"name": "Marty Mcfly", "date":"05-11-1955"}}
 ref.child("users").set(data)
 ```
 
-#### Update
+#### update
 
 To update data for an existing entry use the UPDATE method.
 
@@ -68,7 +68,7 @@ To update data for an existing entry use the UPDATE method.
 ref.child("users").child("Marty").update({"date": "26-10-1985"})
 ```
 
-#### Remove
+#### remove
 
 To delete data for an existing entry use the REMOVE method.
 
@@ -110,7 +110,7 @@ ref.update(data)
 
 ## Queries
 
-### val()
+### val
 Queries return a PyreResponse object. Calling ```val()``` on these objects returns the query data.
 
 ```
@@ -118,7 +118,7 @@ users = ref.child("users").get()
 print(users.val()) # {"Marty": {"name": "Marty", "date": "26-10-1985"}, "Doc": {"name": "Doc", "date": "01-01-1885"}}
 ```
 
-### key()
+### key
 Calling ```key()``` returns the key for the query data.
 
 ```
@@ -126,7 +126,7 @@ user = ref.child("users").get()
 print(user.key()) # users
 ```
 
-### each()
+### each
 Returns a list of objects on each of which you can call ```val()``` and ```key()```.
 
 ```
@@ -136,7 +136,7 @@ for user in all_users.each():
     print(user.val()) # {name": "Marty", "date": "26-10-1985"}
 ```
 
-#### get()
+#### get
 
 To return data from a path simply call the get() method.
 
@@ -144,7 +144,7 @@ To return data from a path simply call the get() method.
 all_users = ref.child("users").get()
 ```
 
-#### shallow()
+#### shallow
 
 To return just the keys at a particular path use the shallow() method.
 
