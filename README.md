@@ -166,7 +166,7 @@ This query will return the first three users ordered by name.
 
 #### order_by_child
 
-We begin any complex query with the orderByChild parameter.
+We begin any complex query with ```order_by_child()```.
 
 ```python
 users_by_name = ref.child("users").order_by_child("name").get()
