@@ -21,9 +21,9 @@ Pyrebase will authenticate as an admin by default, disregarding [security rules]
 
 ### User authentication
 
-The auth_with_password method will return user data including a token you can use to adhere to security rules.
+The ```auth_with_password()``` method will return user data including a token you can use to adhere to security rules.
 
-Each of the following methods accepts an optional user token: get(), push(), set(), update(), and remove().
+Each of the following methods accepts an optional user token: ```get()```, ```push()```, ```set()```, ```update()```, and ```remove()```.
 
 ```python
 user = ref.auth_with_password("email", "password")
@@ -34,7 +34,7 @@ results = ref.child("users").child("Marty").update(data, user["token"])
 ```
 
 ## Building Paths
-You can build paths to your data by using the child() method.
+You can build paths to your data by using the ```child()``` method.
 
 ```python
 ref.child("users").child("Marty")
@@ -44,7 +44,7 @@ ref.child("users").child("Marty")
 
 #### push
 
-To save data with a unique, auto-generated, timestamp-based key, use the PUSH method.
+To save data with a unique, auto-generated, timestamp-based key, use the ```push()``` method.
 
 ```python
 data = {"name": "Marty Mcfly", "date": "05-11-1955"}
@@ -53,7 +53,7 @@ ref.child("users").push(data)
 
 #### set
 
-To create your own keys use the SET method. The key in the example below is "Marty".
+To create your own keys use the ```set()``` method. The key in the example below is "Marty".
 
 ```python
 data = {"Marty": {"name": "Marty Mcfly", "date":"05-11-1955"}}
@@ -62,7 +62,7 @@ ref.child("users").set(data)
 
 #### update
 
-To update data for an existing entry use the UPDATE method.
+To update data for an existing entry use the ```update()``` method.
 
 ```python
 ref.child("users").child("Marty").update({"date": "26-10-1985"})
@@ -70,7 +70,7 @@ ref.child("users").child("Marty").update({"date": "26-10-1985"})
 
 #### remove
 
-To delete data for an existing entry use the REMOVE method.
+To delete data for an existing entry use the ```remove()``` method.
 
 ```python
 ref.child("users").child("Marty").remove()
@@ -78,7 +78,7 @@ ref.child("users").child("Marty").remove()
 
 ### MULTI-LOCATION UPDATES
 
-You can also perform [multi-location updates](https://www.firebase.com/blog/2015-09-24-atomic-writes-and-more.html) with the update method.
+You can also perform [multi-location updates](https://www.firebase.com/blog/2015-09-24-atomic-writes-and-more.html) with the ```update()``` method.
 
 ```python
 data = {
@@ -93,7 +93,7 @@ data = {
 ref.update(data)
 ```
 
-To perform multi-location writes to new locations we can use the generate_key() method.
+To perform multi-location writes to new locations we can use the ```generate_key()``` method.
 
 ```python
 data = {
@@ -138,7 +138,7 @@ for user in all_users.each():
 
 #### get
 
-To return data from a path simply call the get() method.
+To return data from a path simply call the ```get()``` method.
 
 ```python
 all_users = ref.child("users").get()
@@ -146,13 +146,13 @@ all_users = ref.child("users").get()
 
 #### shallow
 
-To return just the keys at a particular path use the shallow() method.
+To return just the keys at a particular path use the ```shallow()``` method.
 
 ```python
 all_user_ids = ref.child("users").shallow().get()
 ```
 
-Note: shallow() can not be used in conjunction with any complex queries.
+Note: ```shallow()``` can not be used in conjunction with any complex queries.
 
 
 ## Complex Queries
@@ -232,7 +232,7 @@ ref.send_password_reset_email("email")
 
 ### generate_key
 
-generate_key() is an implementation of Firebase's [key generation algorithm](https://www.firebase.com/blog/2015-02-11-firebase-unique-identifiers.html).
+```generate_key()``` is an implementation of Firebase's [key generation algorithm](https://www.firebase.com/blog/2015-02-11-firebase-unique-identifiers.html).
 
 See multi-location updates for a potential use case.
 
@@ -241,7 +241,7 @@ See multi-location updates for a potential use case.
 Sometimes we might want to sort our data multiple times. For example, we might want to retrieve all articles written between a
 certain date then sort those articles based on the number of likes.
 
-Currently the REST API only allows us to sort our data once, so the sort() method bridges this gap.
+Currently the REST API only allows us to sort our data once, so the ```sort()``` method bridges this gap.
 
 ```python
 articles = ref.child("articles").order_by_child("date").start_at(startDate).end_at(endDate).get()
