@@ -26,7 +26,7 @@ The authWithPassword method will return user data including a token you can use 
 Each of the following methods accepts an optional user token: get(), push(), set(), update(), and remove().
 
 ```python
-user = ref.authWithPassword("email", "password")
+user = ref.auth_with_password("email", "password")
 data = {
     "date": "26-10-1985"
 }
@@ -93,14 +93,14 @@ data = {
 ref.update(data)
 ```
 
-To perform multi-location writes to new locations with auto-generated keys we can use the generate_key() method.
+To perform multi-location writes to new locations we can use the generate_key() method.
 
 ```python
 data = {
-    "users/"+ref.generateKey(): {
+    "users/"+ref.generate_key(): {
         "date": "26-10-1985"
     },
-    "users/"+ref.generateKey(): {
+    "users/"+ref.generate_key(): {
         "date": "26-10-1985"
     }
 }
@@ -127,7 +127,7 @@ print(user.key()) # users
 ```
 
 ### each()
-Returns a list of objects on which you can call ```val()``` and ```key()```.
+Returns a list of objects on each of which you can call ```val()``` and ```key()```.
 
 ```
 all_users = ref.child("users").get()
@@ -160,43 +160,43 @@ Note: shallow() can not be used in conjunction with any complex queries.
 Queries can be built by chaining multiple query parameters together.
 
 ```python
-users_by_name = ref.child("users").orderByChild("name").limitToFirst(3).get()
+users_by_name = ref.child("users").order_by_child("name").limit_to_first(3).get()
 ```
 This query will return the first three users ordered by name.
 
-#### orderByChild
+#### order_by_child
 
 We begin any complex query with the orderByChild parameter.
 
 ```python
-users_by_name = ref.child("users").orderByChild("name").get()
+users_by_name = ref.child("users").order_by_child("name").get()
 ```
 This query will return users ordered by name.
 
-#### equalTo
+#### equal_to
 
 Return data with a specific value.
 
 ```python
-users_by_score = ref.child("users").orderByChild("score").equalTo(10).get()
+users_by_score = ref.child("users").order_by_child("score").equal_to(10).get()
 ```
 This query will return users with a score of 10.
 
-#### startAt and endAt
+#### start_at and end_at
 
 Specify a range in your data.
 
 ```python
-users_by_score = ref.child("users").orderByChild("score").startAt(3).endAt(10).get()
+users_by_score = ref.child("users").order_by_child("score").start_at(3).end_at(10).get()
 ```
 This query returns users ordered by score and with a score between 3 and 10.
 
-#### limitToFirst and limitToLast
+#### limit_to_first and limit_to_last
 
 Limits data returned.
 
 ```python
-users_by_score = ref.child("users").orderByChild("score").limitToFirst(5).get()
+users_by_score = ref.child("users").order_by_child("score").limit_to_first(5).get()
 ```
 This query returns the first five users ordered by score.
 
@@ -206,33 +206,33 @@ This query returns the first five users ordered by score.
 ### Creating users
 
 ```python
-ref.createUser("email", "password")
+ref.create_user("email", "password")
 ```
 Note: Make sure you have Email & Password Authentication enabled on your firebase dashboard under Login & Auth.
 
 ### Removing users
 
 ```python
-ref.removeUser("email", "password")
+ref.remove_user("email", "password")
 ```
 
 ### Changing user passwords
 
 ```python
-ref.changePassword("email", "old_password", "new_password")
+ref.change_password("email", "old_password", "new_password")
 ```
 
 ### Sending password reset emails
 
 ```python
-ref.sendPasswordResetEmail("email")
+ref.send_password_reset_email("email")
 ```
 
 ## Helper Methods
 
-### generateKey
+### generate_key
 
-generateKey() is an implementation of Firebase's [key generation algorithm](https://www.firebase.com/blog/2015-02-11-firebase-unique-identifiers.html).
+generate_key() is an implementation of Firebase's [key generation algorithm](https://www.firebase.com/blog/2015-02-11-firebase-unique-identifiers.html).
 
 See multi-location updates for a potential use case.
 
@@ -244,7 +244,7 @@ certain date then sort those articles based on the number of likes.
 Currently the REST API only allows us to sort our data once, so the sort() method bridges this gap.
 
 ```python
-articles = ref.child("articles").orderByChild("date").startAt(startDate).endAt(endDate).get()
+articles = ref.child("articles").order_by_child("date").start_at(startDate).end_at(endDate).get()
 articles_by_likes = ref.sort(articles, "likes")
 ```
 

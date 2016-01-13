@@ -1,4 +1,3 @@
-from operator import itemgetter
 import requests
 from requests.exceptions import HTTPError
 from firebase_token_generator import create_token
@@ -39,27 +38,27 @@ class Firebase():
         self.last_push_time = 0
         self.last_rand_chars = []
 
-    def authWithPassword(self, email, password):
+    def auth_with_password(self, email, password):
         request_ref = 'https://auth.firebase.com/auth/firebase?firebase={0}&email={1}&password={2}'.\
             format(self.fire_base_name, email, password)
         request_object = self.requests.get(request_ref)
         return request_object.json()
 
-    def createUser(self, email, password):
+    def create_user(self, email, password):
         request_ref = 'https://auth.firebase.com/auth/firebase/create?firebase={0}&email={1}&password={2}'.\
             format(self.fire_base_name, email, password)
         request_object = self.requests.get(request_ref)
         request_object.raise_for_status()
         return request_object.json()
 
-    def removeUser(self, email, password):
+    def remove_user(self, email, password):
         request_ref = 'https://auth.firebase.com/auth/firebase/remove?firebase={0}&email={1}&password={2}'.\
             format(self.fire_base_name, email, password)
         request_object = self.requests.get(request_ref)
         request_object.raise_for_status()
         return request_object.json()
 
-    def changePassword(self, email, old_password, new_password):
+    def change_password(self, email, old_password, new_password):
         request_ref = 'https://auth.firebase.com/auth/firebase/update?' \
                       'firebase={0}&email={1}&oldPassword={2}&newPassword={3}'.\
             format(self.fire_base_name, email, old_password, new_password)
@@ -67,35 +66,35 @@ class Firebase():
         request_object.raise_for_status()
         return request_object.json()
 
-    def sendPasswordResetEmail(self, email):
+    def send_password_reset_email(self, email):
         request_ref = 'https://auth.firebase.com/auth/firebase/reset_password?firebase={0}&email={1}'.\
             format(self.fire_base_name, email)
         request_object = self.requests.get(request_ref)
         request_object.raise_for_status()
         return request_object.json()
 
-    def orderByChild(self, order):
+    def order_by_child(self, order):
         self.buildQuery["orderBy"] = order
         return self
 
-    def startAt(self, start):
+    def start_at(self, start):
         self.buildQuery["startAt"] = start
         return self
 
-    def endAt(self, end):
+    def end_at(self, end):
         self.buildQuery["endAt"] = end
         return self
 
-    def equalTo(self, equal):
+    def equal_to(self, equal):
         self.buildQuery["equalTo"] = equal
         return self
 
-    def limitToFirst(self, limitFirst):
-        self.buildQuery["limitToLast"] = limitFirst
+    def limit_to_first(self, limit_first):
+        self.buildQuery["limitToLast"] = limit_first
         return self
 
-    def limitToLast(self, limitLast):
-        self.buildQuery["limitToLast"] = limitLast
+    def limit_to_last(self, limit_last):
+        self.buildQuery["limitToLast"] = limit_last
         return self
 
     def shallow(self):
@@ -180,14 +179,14 @@ class Firebase():
         request_object = self.requests.delete(request_ref)
         return request_object.json()
 
-    def generateKey(self):
-        PUSH_CHARS = '-0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz'
+    def generate_key(self):
+        push_chars = '-0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz'
         now = int(time.time() * 1000)
         duplicate_time = now == self.last_push_time
         self.last_push_time = now
         time_stamp_chars = [0] * 8
         for i in reversed(range(0, 8)):
-            time_stamp_chars[i] = PUSH_CHARS[now % 64]
+            time_stamp_chars[i] = push_chars[now % 64]
             now = math.floor(now / 64)
         new_id = "".join(time_stamp_chars)
         if not duplicate_time:
@@ -199,7 +198,7 @@ class Firebase():
                     self.last_rand_chars[i] = 0
                 self.last_rand_chars[i] += 1
         for i in range(0, 12):
-            new_id += PUSH_CHARS[self.last_rand_chars[i]]
+            new_id += push_chars[self.last_rand_chars[i]]
         return new_id
 
     def sort(self, origin, by_key):
