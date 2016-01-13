@@ -19,7 +19,7 @@ ref = pyrebase.Firebase('https://yourfirebaseurl.firebaseio.com', 'yourfirebases
 
 Pyrebase will authenticate as an admin by default, disregarding [security rules](https://www.firebase.com/docs/security/guide/).
 
-### auth_with_password
+### User authentication
 
 The auth_with_password method will return user data including a token you can use to adhere to security rules.
 
