@@ -23,7 +23,7 @@ Pyrebase will authenticate as an admin by default, disregarding [security rules]
 
 The ```auth_with_password()``` method will return user data including a token you can use to adhere to security rules.
 
-Each of the following methods accepts an optional user token: ```get()```, ```push()```, ```set()```, ```update()```, and ```remove()```.
+Each of the following methods accepts an optional user token: ```get()```, ```push()```, ```set()```, ```update()```, ```remove()``` and ```stream()```.
 
 ```python
 user = ref.auth_with_password("email", "password")
@@ -154,6 +154,25 @@ all_user_ids = ref.child("users").shallow().get()
 
 Note: ```shallow()``` can not be used in conjunction with any complex queries.
 
+## Streaming
+
+#### stream
+
+You can listen to live changes to your data with the ```stream()``` method.
+
+```python
+def stream_handler(posts):
+    for post in posts:
+        print(post["event"]) # put
+        print(post["path"]) # /-K7yGTTEp7O549EzTYtI
+        print(post["data"]) # {'title': 'Pyrebase', "body": "etc..."}
+
+my_stream = ref.child("posts").stream(stream_handler)
+```
+
+#### close the stream
+
+```my_stream.close()```
 
 ## Complex Queries
 

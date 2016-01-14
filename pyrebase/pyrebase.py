@@ -8,7 +8,9 @@ import math
 from random import uniform
 import time
 from collections import OrderedDict
-
+from sseclient import SSEClient
+import threading
+import socket
 
 class Firebase():
     """ Firebase Interface """
@@ -34,7 +36,7 @@ class Firebase():
         self.fire_base_name = name
         self.secret = fire_base_secret
         self.path = ""
-        self.buildQuery = {}
+        self.build_query = {}
         self.last_push_time = 0
         self.last_rand_chars = []
 
@@ -74,31 +76,31 @@ class Firebase():
         return request_object.json()
 
     def order_by_child(self, order):
-        self.buildQuery["orderBy"] = order
+        self.build_query["orderBy"] = order
         return self
 
     def start_at(self, start):
-        self.buildQuery["startAt"] = start
+        self.build_query["startAt"] = start
         return self
 
     def end_at(self, end):
-        self.buildQuery["endAt"] = end
+        self.build_query["endAt"] = end
         return self
 
     def equal_to(self, equal):
-        self.buildQuery["equalTo"] = equal
+        self.build_query["equalTo"] = equal
         return self
 
     def limit_to_first(self, limit_first):
-        self.buildQuery["limitToLast"] = limit_first
+        self.build_query["limitToLast"] = limit_first
         return self
 
     def limit_to_last(self, limit_last):
-        self.buildQuery["limitToLast"] = limit_last
+        self.build_query["limitToLast"] = limit_last
         return self
 
     def shallow(self):
-        self.buildQuery["shallow"] = True
+        self.build_query["shallow"] = True
         return self
 
     def child(self, *args):
@@ -112,44 +114,52 @@ class Firebase():
         return self
 
     def get(self, token=None):
-        parameters = {}
-        parameters['auth'] = check_token(token, self.token)
-        for param in list(self.buildQuery):
-            if type(self.buildQuery[param]) is str:
-                parameters[param] = quote('"' + self.buildQuery[param] + '"')
-            else:
-                parameters[param] = self.buildQuery[param]
-        request_ref = '{0}{1}.json?{2}'.format(self.fire_base_url, self.path, urlencode(parameters))
-        # reset path and buildQuery for next query
+        build_query = self.build_query
         query_key = self.path.split("/")[-1]
-        self.path = ""
-        buildQuery = self.buildQuery
-        self.buildQuery = {}
+        request_ref = self.build_request_url(token)
         # do request
         request_object = self.requests.get(request_ref)
-        # return if error
         try:
             request_object.raise_for_status()
         except HTTPError as e:
+            # raise detailed error message
             raise HTTPError(e, request_object.text)
 
         request_dict = request_object.json()
         # if primitive or simple query return
         if not isinstance(request_dict, dict):
             return PyreResponse(request_dict, query_key)
-        if not buildQuery:
+        if not build_query:
             return PyreResponse(convert_to_pyre(request_dict.items()), query_key)
-        # return keys if shallow is enabled
-        if buildQuery.get("shallow"):
+        # return keys if shallow
+        if build_query.get("shallow"):
             return PyreResponse(request_dict.keys(), query_key)
         # otherwise sort
         sorted_response = None
-        if buildQuery.get("orderBy"):
-            if buildQuery["orderBy"] == "$key":
+        if build_query.get("orderBy"):
+            if build_query["orderBy"] == "$key":
                 sorted_response = sorted(request_dict.items(), key=lambda item: item[0])
             else:
-                sorted_response = sorted(request_dict.items(), key=lambda item: item[1][buildQuery["orderBy"]])
+                sorted_response = sorted(request_dict.items(), key=lambda item: item[1][build_query["orderBy"]])
         return PyreResponse(convert_to_pyre(sorted_response), query_key)
+
+    def stream(self, stream_handler, token=None):
+        request_ref = self.build_request_url(token)
+        return Stream(request_ref, stream_handler)
+
+    def build_request_url(self, token):
+        parameters = {}
+        parameters['auth'] = check_token(token, self.token)
+        for param in list(self.build_query):
+            if type(self.build_query[param]) is str:
+                parameters[param] = quote('"' + self.build_query[param] + '"')
+            else:
+                parameters[param] = self.build_query[param]
+        # reset path and build_query for next query
+        request_ref = '{0}{1}.json?{2}'.format(self.fire_base_url, self.path, urlencode(parameters))
+        self.path = ""
+        self.build_query = {}
+        return request_ref
 
     def push(self, data, token=None):
         request_token = check_token(token, self.token)
@@ -226,11 +236,13 @@ class PyreResponse:
 
     def val(self):
         if isinstance(self.pyres, list):
+            # unpack pyres into OrderedDict
             pyre_list = []
             for pyre in self.pyres:
                 pyre_list.append((pyre.key(), pyre.val()))
             return OrderedDict(pyre_list)
         else:
+            # return primitive or simple query results
             return self.pyres
 
     def key(self):
@@ -250,6 +262,55 @@ class Pyre:
 
     def key(self):
         return self.item[0]
+
+
+class ClosableSSEClient(SSEClient):
+    def __init__(self, *args, **kwargs):
+        self.should_connect = True
+        super(ClosableSSEClient, self).__init__(*args, **kwargs)
+
+    def _connect(self):
+        if self.should_connect:
+            super(ClosableSSEClient, self)._connect()
+        else:
+            raise StopIteration()
+
+    def close(self):
+        self.should_connect = False
+        self.retry = 0
+        self.resp.raw._fp.fp.raw._sock.shutdown(socket.SHUT_RDWR)
+        self.resp.raw._fp.fp.raw._sock.close()
+
+
+class Stream:
+    def __init__(self, url, stream_handler):
+        self.url = url
+        self.stream_handler = stream_handler
+        self.sse = None
+        self.thread = None
+        self.start()
+
+    def start(self):
+        self.thread = threading.Thread(target=self.start_stream,
+                                       args=(self.url, self.stream_handler))
+        self.thread.start()
+        return self
+
+    def start_stream(self, url, stream_handler):
+        self.sse = ClosableSSEClient(url)
+        messages = []
+        for msg in self.sse:
+            msg_data = json.loads(msg.data)
+            # don't return initial data
+            if msg_data['path'] != '/':
+                msg_data["event"] = msg.event
+                messages.append(msg_data)
+                stream_handler(messages)
+
+    def close(self):
+        self.sse.close()
+        self.thread.join()
+        return self
 
 
 def check_token(user_token, admin_token):
