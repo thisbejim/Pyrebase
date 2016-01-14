@@ -1,4 +1,4 @@
-# Pyrebase [![PyPI downloads](https://img.shields.io/pypi/v/Pyrebase.svg)](https://pypi.python.org/pypi/Pyrebase) [![PyPI downloads](https://img.shields.io/pypi/dw/Pyrebase.svg)](https://pypi.python.org/pypi/Pyrebase)
+# Pyrebase [!(https://img.shields.io/pypi/v/Pyrebase.svg)](https://pypi.python.org/pypi/Pyrebase) [!(https://img.shields.io/pypi/dw/Pyrebase.svg)](https://pypi.python.org/pypi/Pyrebase)
 
 A simple python wrapper for the [Firebase API](https://www.firebase.com/docs/rest/guide/).
 
@@ -172,7 +172,9 @@ my_stream = ref.child("posts").stream(stream_handler)
 
 #### close the stream
 
-```my_stream.close()```
+```python
+my_stream.close()
+```
 
 ## Complex Queries
 
