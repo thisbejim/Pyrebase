@@ -156,8 +156,6 @@ Note: ```shallow()``` can not be used in conjunction with any complex queries.
 
 ## Streaming
 
-#### stream
-
 You can listen to live changes to your data with the ```stream()``` method.
 
 ```python
