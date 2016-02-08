@@ -32,6 +32,9 @@ class Firebase():
 
         self.token = create_token(fire_base_secret, auth_payload, options)
         self.requests = requests.Session()
+        adapter = requests.adapters.HTTPAdapter(max_retries=3)
+        for scheme in ('http://', 'https://'):
+            self.requests.mount(scheme, adapter)
         self.fire_base_url = url
         self.fire_base_name = name
         self.secret = fire_base_secret
