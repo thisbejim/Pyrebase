@@ -76,7 +76,7 @@ To delete data for an existing entry use the ```remove()``` method.
 ref.child("users").child("Marty").remove()
 ```
 
-### MULTI-LOCATION UPDATES
+### Multi-location updates
 
 You can also perform [multi-location updates](https://www.firebase.com/blog/2015-09-24-atomic-writes-and-more.html) with the ```update()``` method.
 
