@@ -159,11 +159,10 @@ Note: ```shallow()``` can not be used in conjunction with any complex queries.
 You can listen to live changes to your data with the ```stream()``` method.
 
 ```python
-def stream_handler(posts):
-    for post in posts:
-        print(post["event"]) # put
-        print(post["path"]) # /-K7yGTTEp7O549EzTYtI
-        print(post["data"]) # {'title': 'Pyrebase', "body": "etc..."}
+def stream_handler(post):
+    print(post["event"]) # put
+    print(post["path"]) # /-K7yGTTEp7O549EzTYtI
+    print(post["data"]) # {'title': 'Pyrebase', "body": "etc..."}
 
 my_stream = ref.child("posts").stream(stream_handler)
 ```

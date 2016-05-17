@@ -301,14 +301,12 @@ class Stream:
 
     def start_stream(self, url, stream_handler):
         self.sse = ClosableSSEClient(url)
-        messages = []
         for msg in self.sse:
             msg_data = json.loads(msg.data)
             # don't return initial data
-            if msg_data['path'] != '/':
+            if msg_data and msg_data['path'] != '/':
                 msg_data["event"] = msg.event
-                messages.append(msg_data)
-                stream_handler(messages)
+                stream_handler(msg_data)
 
     def close(self):
         self.sse.close()
