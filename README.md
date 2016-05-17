@@ -19,6 +19,13 @@ ref = pyrebase.Firebase('https://yourfirebaseurl.firebaseio.com', 'yourfirebases
 
 Pyrebase will authenticate as an admin by default, disregarding [security rules](https://www.firebase.com/docs/security/guide/).
 
+When initialising your Firebase you can also pass in a timestamp to specify when the admin token should expire:
+
+```
+jan_2100 = 4102444800
+ref = pyrebase.Firebase('https://yourfirebaseurl.firebaseio.com', 'yourfirebasesecret', jan_2100)
+```
+
 ### User authentication
 
 The ```auth_with_password()``` method will return user data including a token you can use to adhere to security rules.

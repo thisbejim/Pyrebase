@@ -17,7 +17,7 @@ import socket
 
 class Firebase():
     """ Firebase Interface """
-    def __init__(self, fire_base_url, fire_base_secret):
+    def __init__(self, fire_base_url, fire_base_secret, expires=None):
         if not fire_base_url.endswith('/'):
             url = ''.join([fire_base_url, '/'])
         else:
@@ -32,6 +32,8 @@ class Firebase():
         # default to admin
         auth_payload = {"uid": "1"}
         options = {"admin": True}
+        if expires:
+            options["expires"] = expires
 
         self.token = create_token(fire_base_secret, auth_payload, options)
         self.requests = requests.Session()
