@@ -1,7 +1,10 @@
 import requests
 from requests.exceptions import HTTPError
 from firebase_token_generator import create_token
-from urllib.parse import urlencode, quote
+try:
+    from urllib.parse import urlencode, quote
+except:
+    from urllib import urlencode, quote
 import re
 import json
 import math
@@ -95,7 +98,7 @@ class Firebase():
         return self
 
     def limit_to_first(self, limit_first):
-        self.build_query["limitToLast"] = limit_first
+        self.build_query["limitToFirst"] = limit_first
         return self
 
     def limit_to_last(self, limit_last):
