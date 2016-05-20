@@ -30,7 +30,9 @@ firebase = pyrebase.initialize_app(config)
 A Pyrebase app can use multiple Firebase services.
 
 ```firebase.auth()``` - [Authentication](#authentication)
+
 ```firebase.database()``` - [Database](#database)
+
 ```firebase.storage()``` - [Storage](#storage)
 
 Check out the documentation for each service for further details.
