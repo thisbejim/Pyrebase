@@ -4,9 +4,21 @@ A simple python wrapper for the [Firebase API](https://firebase.google.com).
 
 ## Installation
 
+### Firebase 3
+
 ```python
 pip install pyrebase
 ```
+
+### Firebase 2
+
+Pyrebase was first written for Firebase 2, if you have yet to migrate you can still use the older version.
+
+```python
+pip install pyrebase==2.0.0
+```
+
+You can find the docs for Pyrebase 2 [here](https://github.com/thisbejim/Pyrebase/tree/921a2126889186a65fbf81c7ee91a6178846619b).
 
 ## Getting Started
 
