@@ -15,73 +15,102 @@ from sseclient import SSEClient
 import threading
 import socket
 
+
+def initialize_app(config):
+    return Firebase(config)
+
+
 class Firebase():
     """ Firebase Interface """
-    def __init__(self, fire_base_url, fire_base_secret, expires=None):
-        if not fire_base_url.endswith('/'):
-            url = ''.join([fire_base_url, '/'])
-        else:
-            url = fire_base_url
-        # find db name between http:// and .firebaseio.com
-        db_name = re.search('https://(.*).firebaseio.com', fire_base_url)
-        if db_name:
-            name = db_name.group(1)
-        else:
-            db_name = re.search('(.*).firebaseio.com', fire_base_url)
-            name = db_name.group(1)
-        # default to admin
-        auth_payload = {"uid": "1"}
-        options = {"admin": True}
-        if expires:
-            options["expires"] = expires
-
-        self.token = create_token(fire_base_secret, auth_payload, options)
+    def __init__(self, config):
+        self.api_key = config["apiKey"]
+        self.auth_domain = config["authDomain"]
+        self.database_url = config["databaseURL"]
+        self.storage_bucket = config["storageBucket"]
         self.requests = requests.Session()
         adapter = requests.adapters.HTTPAdapter(max_retries=3)
         for scheme in ('http://', 'https://'):
             self.requests.mount(scheme, adapter)
-        self.fire_base_url = url
-        self.fire_base_name = name
-        self.secret = fire_base_secret
+
+    def auth(self):
+        return Auth(self.api_key, self.requests)
+
+    def database(self):
+        return Database(self.api_key, self.database_url, self.requests)
+
+    def storage(self):
+        return Storage(self.storage_bucket, self.requests)
+
+
+class Auth():
+    """ Auth Interface """
+    def __init__(self, api_key, requests):
+        self.api_key = api_key
+        self.current_user = None
+        self.requests = requests
+
+    def sign_in_with_email_and_password(self, email, password):
+        request_ref = "https://www.googleapis.com/identitytoolkit/v3/relyingparty/verifyPassword?key={0}".format(self.api_key)
+        headers = {"content-type": "application/json; charset=UTF-8"}
+        data = json.dumps({"email": email, "password": password, "returnSecureToken": True})
+        request_object = requests.post(request_ref, headers=headers, data=data)
+        self.current_user = request_object.json()
+        return request_object.json()
+
+    def get_account_info(self, id_token):
+        request_ref = "https://www.googleapis.com/identitytoolkit/v3/relyingparty/getAccountInfo?key={0}".format(self.api_key)
+        headers = {"content-type": "application/json; charset=UTF-8"}
+        data = json.dumps({"idToken": id_token})
+        request_object = requests.post(request_ref, headers=headers, data=data)
+        return request_object.json()
+
+    def send_email_verification(self, id_token):
+        request_ref = "https://www.googleapis.com/identitytoolkit/v3/relyingparty/getOobConfirmationCode?key={0}".format(self.api_key)
+        headers = {"content-type": "application/json; charset=UTF-8"}
+        data = json.dumps({"requestType": "VERIFY_EMAIL", "idToken": id_token})
+        request_object = requests.post(request_ref, headers=headers, data=data)
+        return request_object.json()
+
+    def send_password_reset_email(self, email):
+        request_ref = "https://www.googleapis.com/identitytoolkit/v3/relyingparty/getOobConfirmationCode?key={0}".format(self.api_key)
+        headers = {"content-type": "application/json; charset=UTF-8"}
+        data = json.dumps({"requestType": "PASSWORD_RESET", "email": email})
+        request_object = requests.post(request_ref, headers=headers, data=data)
+        return request_object.json()
+
+    def verify_password_reset_code(self, reset_code, new_password):
+        request_ref = "https://www.googleapis.com/identitytoolkit/v3/relyingparty/resetPassword?key={0}".format(self.api_key)
+        headers = {"content-type": "application/json; charset=UTF-8"}
+        data = json.dumps({"oobCode": reset_code, "newPassword": new_password})
+        request_object = requests.post(request_ref, headers=headers, data=data)
+        return request_object.json()
+
+    def create_user_with_email_and_password(self, email, password):
+        request_ref = "https://www.googleapis.com/identitytoolkit/v3/relyingparty/signupNewUser?key={0}".format(self.api_key)
+        headers = {"content-type": "application/json; charset=UTF-8" }
+        data = json.dumps({"email": email, "password": password, "returnSecureToken": True})
+        request_object = requests.get(request_ref, headers=headers, data=data)
+        request_object.raise_for_status()
+        return request_object.json()
+
+
+class Database():
+    """ Database Interface """
+    def __init__(self, api_key, database_url, requests):
+
+        if not database_url.endswith('/'):
+            url = ''.join([database_url, '/'])
+        else:
+            url = database_url
+
+        self.api_key = api_key
+        self.database_url = url
+        self.requests = requests
+
         self.path = ""
         self.build_query = {}
         self.last_push_time = 0
         self.last_rand_chars = []
-
-    def auth_with_password(self, email, password):
-        request_ref = 'https://auth.firebase.com/auth/firebase?firebase={0}&email={1}&password={2}'.\
-            format(self.fire_base_name, email, password)
-        request_object = self.requests.get(request_ref)
-        return request_object.json()
-
-    def create_user(self, email, password):
-        request_ref = 'https://auth.firebase.com/auth/firebase/create?firebase={0}&email={1}&password={2}'.\
-            format(self.fire_base_name, email, password)
-        request_object = self.requests.get(request_ref)
-        request_object.raise_for_status()
-        return request_object.json()
-
-    def remove_user(self, email, password):
-        request_ref = 'https://auth.firebase.com/auth/firebase/remove?firebase={0}&email={1}&password={2}'.\
-            format(self.fire_base_name, email, password)
-        request_object = self.requests.get(request_ref)
-        request_object.raise_for_status()
-        return request_object.json()
-
-    def change_password(self, email, old_password, new_password):
-        request_ref = 'https://auth.firebase.com/auth/firebase/update?' \
-                      'firebase={0}&email={1}&oldPassword={2}&newPassword={3}'.\
-            format(self.fire_base_name, email, old_password, new_password)
-        request_object = self.requests.get(request_ref)
-        request_object.raise_for_status()
-        return request_object.json()
-
-    def send_password_reset_email(self, email):
-        request_ref = 'https://auth.firebase.com/auth/firebase/reset_password?firebase={0}&email={1}'.\
-            format(self.fire_base_name, email)
-        request_object = self.requests.get(request_ref)
-        request_object.raise_for_status()
-        return request_object.json()
 
     def order_by_child(self, order):
         self.build_query["orderBy"] = order
@@ -121,6 +150,20 @@ class Firebase():
             self.path = new_path
         return self
 
+    def build_request_url(self, token):
+        parameters = {}
+        parameters['auth'] = token
+        for param in list(self.build_query):
+            if type(self.build_query[param]) is str:
+                parameters[param] = quote('"' + self.build_query[param] + '"')
+            else:
+                parameters[param] = self.build_query[param]
+        # reset path and build_query for next query
+        request_ref = '{0}{1}.json?{2}'.format(self.database_url, self.path, urlencode(parameters))
+        self.path = ""
+        self.build_query = {}
+        return request_ref
+
     def get(self, token=None):
         build_query = self.build_query
         query_key = self.path.split("/")[-1]
@@ -151,51 +194,34 @@ class Firebase():
                 sorted_response = sorted(request_dict.items(), key=lambda item: item[1][build_query["orderBy"]])
         return PyreResponse(convert_to_pyre(sorted_response), query_key)
 
-    def stream(self, stream_handler, token=None):
-        request_ref = self.build_request_url(token)
-        return Stream(request_ref, stream_handler)
-
-    def build_request_url(self, token):
-        parameters = {}
-        parameters['auth'] = check_token(token, self.token)
-        for param in list(self.build_query):
-            if type(self.build_query[param]) is str:
-                parameters[param] = quote('"' + self.build_query[param] + '"')
-            else:
-                parameters[param] = self.build_query[param]
-        # reset path and build_query for next query
-        request_ref = '{0}{1}.json?{2}'.format(self.fire_base_url, self.path, urlencode(parameters))
+    def push(self, data, token):
+        request_ref = '{0}{1}.json?auth={2}'.format(self.database_url, self.path, token)
         self.path = ""
-        self.build_query = {}
-        return request_ref
-
-    def push(self, data, token=None):
-        request_token = check_token(token, self.token)
-        request_ref = '{0}{1}.json?auth={2}'.format(self.fire_base_url, self.path, request_token)
-        self.path = ""
-        request_object = self.requests.post(request_ref, data=json.dumps(data))
+        headers = {"content-type": "application/json; charset=UTF-8" }
+        request_object = self.requests.post(request_ref, headers=headers, data=json.dumps(data))
         return request_object.json()
 
-    def set(self, data, token=None):
-        request_token = check_token(token, self.token)
-        request_ref = '{0}{1}.json?auth={2}'.format(self.fire_base_url, self.path, request_token)
+    def set(self, data, token):
+        request_ref = '{0}{1}.json?auth={2}'.format(self.database_url, self.path, token)
         self.path = ""
         request_object = self.requests.put(request_ref, data=json.dumps(data))
         return request_object.json()
 
-    def update(self, data, token=None):
-        request_token = check_token(token, self.token)
-        request_ref = '{0}{1}.json?auth={2}'.format(self.fire_base_url, self.path, request_token)
+    def update(self, data, token):
+        request_ref = '{0}{1}.json?auth={2}'.format(self.database_url, self.path, token)
         self.path = ""
         request_object = self.requests.patch(request_ref, data=json.dumps(data))
         return request_object.json()
 
-    def remove(self, token=None):
-        request_token = check_token(token, self.token)
-        request_ref = '{0}{1}.json?auth={2}'.format(self.fire_base_url, self.path, request_token)
+    def remove(self, token):
+        request_ref = '{0}{1}.json?auth={2}'.format(self.database_url, self.path, token)
         self.path = ""
         request_object = self.requests.delete(request_ref)
         return request_object.json()
+
+    def stream(self, stream_handler, token):
+        request_ref = self.build_request_url(token)
+        return Stream(request_ref, stream_handler)
 
     def generate_key(self):
         push_chars = '-0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz'
@@ -228,6 +254,19 @@ class Firebase():
         # sort
         data = sorted(dict(new_list).items(), key=lambda item: item[1][by_key])
         return PyreResponse(convert_to_pyre(data), origin.key())
+
+
+class Storage():
+    def __init__(self, storage_bucket, requests):
+        self.storage_bucket = "https://firebasestorage.googleapis.com/v0/b/" + storage_bucket
+        self.requests = requests
+
+    def put(self, file_path, file_name, token):
+        file = open(file_path, 'rb')
+        request_ref = self.storage_bucket + "/o?name={0}".format(file_name)
+        headers = {"Authorization": "Firebase "+token}
+        request_object = self.requests.put(request_ref, headers=headers, data=file)
+        return request_object.json()
 
 
 def convert_to_pyre(items):
