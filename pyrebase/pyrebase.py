@@ -14,6 +14,7 @@ from collections import OrderedDict
 from sseclient import SSEClient
 import threading
 import socket
+from gcloud import storage
 
 
 def initialize_app(config):
@@ -27,6 +28,7 @@ class Firebase():
         self.auth_domain = config["authDomain"]
         self.database_url = config["databaseURL"]
         self.storage_bucket = config["storageBucket"]
+        self.service_account = config["serviceAccount"]
         self.requests = requests.Session()
         adapter = requests.adapters.HTTPAdapter(max_retries=3)
         for scheme in ('http://', 'https://'):
@@ -39,7 +41,7 @@ class Firebase():
         return Database(self.api_key, self.database_url, self.requests)
 
     def storage(self):
-        return Storage(self.storage_bucket, self.requests)
+        return Storage(self.storage_bucket, self.service_account)
 
 
 class Auth():
@@ -257,16 +259,22 @@ class Database():
 
 
 class Storage():
-    def __init__(self, storage_bucket, requests):
-        self.storage_bucket = "https://firebasestorage.googleapis.com/v0/b/" + storage_bucket
-        self.requests = requests
+    def __init__(self, storage_bucket, service_account):
+        client = storage.Client.from_service_account_json(service_account, storage_bucket)
+        self.bucket = client.get_bucket(storage_bucket)
 
-    def put(self, file_path, file_name, token):
-        file = open(file_path, 'rb')
-        request_ref = self.storage_bucket + "/o?name={0}".format(file_name)
-        headers = {"Authorization": "Firebase "+token}
-        request_object = self.requests.put(request_ref, headers=headers, data=file)
-        return request_object.json()
+    def put(self, file_path, file_name):
+        blob = self.bucket.blob(file_name)
+        blob.upload_from_filename(filename=file_path, uploadType="resumable")
+
+    def delete(self, name):
+        self.bucket.delete_blob(name)
+
+    def get(self, name):
+        return self.bucket.get_blob(name)
+
+    def list_files(self):
+        return self.bucket.list_blobs()
 
 
 def convert_to_pyre(items):
