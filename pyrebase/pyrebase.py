@@ -154,7 +154,8 @@ class Database():
 
     def build_request_url(self, token):
         parameters = {}
-        parameters['auth'] = token
+        if token:
+            parameters['auth'] = token
         for param in list(self.build_query):
             if type(self.build_query[param]) is str:
                 parameters[param] = quote('"' + self.build_query[param] + '"')
