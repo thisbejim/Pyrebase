@@ -15,5 +15,5 @@ setup(
     ],
     keywords='Firebase',
     packages=find_packages(exclude=['tests']),
-    install_requires=['requests', 'firebase_token_generator', 'sseclient']
+    install_requires=['requests', 'firebase_token_generator', 'sseclient', 'gcloud']
 )
