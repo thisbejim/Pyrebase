@@ -266,7 +266,7 @@ class Storage():
 
     def put(self, file_path, file_name):
         blob = self.bucket.blob(file_name)
-        blob.upload_from_filename(filename=file_path, uploadType="resumable")
+        blob.upload_from_filename(filename=file_path)
 
     def delete(self, name):
         self.bucket.delete_blob(name)
