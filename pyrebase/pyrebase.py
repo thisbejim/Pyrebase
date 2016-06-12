@@ -197,32 +197,32 @@ class Database():
                 sorted_response = sorted(request_dict.items(), key=lambda item: item[1][build_query["orderBy"]])
         return PyreResponse(convert_to_pyre(sorted_response), query_key)
 
-    def push(self, data, token):
-        request_ref = '{0}{1}.json?auth={2}'.format(self.database_url, self.path, token)
+    def push(self, data, token=None):
+        request_ref = self.build_request_url(token)
         self.path = ""
         headers = {"content-type": "application/json; charset=UTF-8" }
         request_object = self.requests.post(request_ref, headers=headers, data=json.dumps(data))
         return request_object.json()
 
-    def set(self, data, token):
-        request_ref = '{0}{1}.json?auth={2}'.format(self.database_url, self.path, token)
+    def set(self, data, token=None):
+        request_ref = self.build_request_url(token)
         self.path = ""
         request_object = self.requests.put(request_ref, data=json.dumps(data))
         return request_object.json()
 
-    def update(self, data, token):
-        request_ref = '{0}{1}.json?auth={2}'.format(self.database_url, self.path, token)
+    def update(self, data, token=None):
+        request_ref = self.build_request_url(token)
         self.path = ""
         request_object = self.requests.patch(request_ref, data=json.dumps(data))
         return request_object.json()
 
-    def remove(self, token):
-        request_ref = '{0}{1}.json?auth={2}'.format(self.database_url, self.path, token)
+    def remove(self, token=None):
+        request_ref = self.build_request_url(token)
         self.path = ""
         request_object = self.requests.delete(request_ref)
         return request_object.json()
 
-    def stream(self, stream_handler, token):
+    def stream(self, stream_handler, token=None):
         request_ref = self.build_request_url(token)
         return Stream(request_ref, stream_handler)
 
@@ -258,6 +258,8 @@ class Database():
         data = sorted(dict(new_list).items(), key=lambda item: item[1][by_key])
         return PyreResponse(convert_to_pyre(data), origin.key())
 
+    def append_auth_token(token):
+
 
 class Storage():
     def __init__(self, storage_bucket, service_account):
@@ -266,7 +268,7 @@ class Storage():
 
     def put(self, file_path, file_name):
         blob = self.bucket.blob(file_name)
-        blob.upload_from_filename(filename=file_path, uploadType="resumable")
+        blob.upload_from_filename(filename=file_path)
 
     def delete(self, name):
         self.bucket.delete_blob(name)
