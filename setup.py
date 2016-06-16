@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='Pyrebase',
-    version='3.0.1',
+    version='3.0.2',
     url='https://github.com/thisbejim/Pyrebase',
     description='A simple python wrapper for the Firebase API',
     author='James Childs-Maidment',
@@ -15,5 +15,5 @@ setup(
     ],
     keywords='Firebase',
     packages=find_packages(exclude=['tests']),
-    install_requires=['requests', 'firebase_token_generator', 'sseclient', 'gcloud']
+    install_requires=['requests', 'sseclient', 'gcloud']
 )

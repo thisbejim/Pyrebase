@@ -1,11 +1,9 @@
 import requests
 from requests.exceptions import HTTPError
-from firebase_token_generator import create_token
 try:
     from urllib.parse import urlencode, quote
 except:
     from urllib import urlencode, quote
-import re
 import json
 import math
 from random import uniform
@@ -197,34 +195,40 @@ class Database():
                 sorted_response = sorted(request_dict.items(), key=lambda item: item[1][build_query["orderBy"]])
         return PyreResponse(convert_to_pyre(sorted_response), query_key)
 
-    def push(self, data, token):
-        request_ref = '{0}{1}.json?auth={2}'.format(self.database_url, self.path, token)
+    def push(self, data, token=None):
+        request_ref = self.check_token(self.database_url, self.path, token)
         self.path = ""
         headers = {"content-type": "application/json; charset=UTF-8" }
         request_object = self.requests.post(request_ref, headers=headers, data=json.dumps(data))
         return request_object.json()
 
-    def set(self, data, token):
-        request_ref = '{0}{1}.json?auth={2}'.format(self.database_url, self.path, token)
+    def set(self, data, token=None):
+        request_ref = self.check_token(self.database_url, self.path, token)
         self.path = ""
         request_object = self.requests.put(request_ref, data=json.dumps(data))
         return request_object.json()
 
-    def update(self, data, token):
-        request_ref = '{0}{1}.json?auth={2}'.format(self.database_url, self.path, token)
+    def update(self, data, token=None):
+        request_ref = self.check_token(self.database_url, self.path, token)
         self.path = ""
         request_object = self.requests.patch(request_ref, data=json.dumps(data))
         return request_object.json()
 
-    def remove(self, token):
-        request_ref = '{0}{1}.json?auth={2}'.format(self.database_url, self.path, token)
+    def remove(self, token=None):
+        request_ref = self.check_token(self.database_url, self.path, token)
         self.path = ""
         request_object = self.requests.delete(request_ref)
         return request_object.json()
 
-    def stream(self, stream_handler, token):
+    def stream(self, stream_handler, token=None):
         request_ref = self.build_request_url(token)
         return Stream(request_ref, stream_handler)
+
+    def check_token(self, database_url, path, token):
+        if token:
+            return '{0}{1}.json?auth={2}'.format(database_url, path, token)
+        else:
+            return '{0}{1}.json'.format(database_url, path)
 
     def generate_key(self):
         push_chars = '-0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz'
@@ -365,10 +369,3 @@ class Stream:
         self.sse.close()
         self.thread.join()
         return self
-
-
-def check_token(user_token, admin_token):
-    if user_token:
-        return user_token
-    else:
-        return admin_token
