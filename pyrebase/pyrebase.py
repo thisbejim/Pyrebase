@@ -54,6 +54,7 @@ class Auth():
         headers = {"content-type": "application/json; charset=UTF-8"}
         data = json.dumps({"email": email, "password": password, "returnSecureToken": True})
         request_object = requests.post(request_ref, headers=headers, data=data)
+        request_object.raise_for_status()
         self.current_user = request_object.json()
         return request_object.json()
 
@@ -62,6 +63,7 @@ class Auth():
         headers = {"content-type": "application/json; charset=UTF-8"}
         data = json.dumps({"idToken": id_token})
         request_object = requests.post(request_ref, headers=headers, data=data)
+        request_object.raise_for_status()
         return request_object.json()
 
     def send_email_verification(self, id_token):
@@ -69,6 +71,7 @@ class Auth():
         headers = {"content-type": "application/json; charset=UTF-8"}
         data = json.dumps({"requestType": "VERIFY_EMAIL", "idToken": id_token})
         request_object = requests.post(request_ref, headers=headers, data=data)
+        request_object.raise_for_status()
         return request_object.json()
 
     def send_password_reset_email(self, email):
@@ -76,6 +79,7 @@ class Auth():
         headers = {"content-type": "application/json; charset=UTF-8"}
         data = json.dumps({"requestType": "PASSWORD_RESET", "email": email})
         request_object = requests.post(request_ref, headers=headers, data=data)
+        request_object.raise_for_status()
         return request_object.json()
 
     def verify_password_reset_code(self, reset_code, new_password):
@@ -83,13 +87,14 @@ class Auth():
         headers = {"content-type": "application/json; charset=UTF-8"}
         data = json.dumps({"oobCode": reset_code, "newPassword": new_password})
         request_object = requests.post(request_ref, headers=headers, data=data)
+        request_object.raise_for_status()
         return request_object.json()
 
     def create_user_with_email_and_password(self, email, password):
         request_ref = "https://www.googleapis.com/identitytoolkit/v3/relyingparty/signupNewUser?key={0}".format(self.api_key)
         headers = {"content-type": "application/json; charset=UTF-8" }
         data = json.dumps({"email": email, "password": password, "returnSecureToken": True})
-        request_object = requests.get(request_ref, headers=headers, data=data)
+        request_object = requests.post(request_ref, headers=headers, data=data)
         request_object.raise_for_status()
         return request_object.json()
 
