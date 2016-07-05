@@ -1,2 +1,0 @@
-requests-futures==0.9.5
-firebase-token-generator==2.0.1

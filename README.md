@@ -22,7 +22,29 @@ Be sure to check out the docs for [Pyrebase 2](https://github.com/thisbejim/Pyre
 
 ## Getting Started
 
+### Python Version
+
+Pyrebase was written for python 3 and will not work correctly with python 2.
+
 ### Add Pyrebase to your application
+
+For use with only user based authentication we can create the following configuration:
+
+```python
+import pyrebase
+
+config = {
+  "apiKey": "apiKey",
+  "authDomain": "projectId.firebaseapp.com",
+  "databaseURL": "https://databaseName.firebaseio.com",
+  "storageBucket": "projectId.appspot.com"
+}
+
+firebase = pyrebase.initialize_app(config)
+```
+
+We can optionally add a [service account credential](https://firebase.google.com/docs/server/setup#prerequisites) to our
+configuration that will allow our server to authenticate with Firebase as an admin and disregard any security rules.
 
 ```python
 import pyrebase
@@ -37,6 +59,9 @@ config = {
 
 firebase = pyrebase.initialize_app(config)
 ```
+
+Adding a service account will authenticate as an admin by default for all database queries, check out the
+[Authentication documentation](#authentication) for how to authenticate users.
 
 ### Use Services
 

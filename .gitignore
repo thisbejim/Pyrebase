@@ -4,6 +4,8 @@ Pyrebase.egg-info
 build
 dist
 test.py
+run.py
+castsub.json
 __pycache__
 *.pyc
 pyrebase.py.orig

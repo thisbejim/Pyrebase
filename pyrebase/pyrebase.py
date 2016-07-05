@@ -12,6 +12,7 @@ from collections import OrderedDict
 from sseclient import SSEClient
 import threading
 import socket
+from oauth2client.service_account import ServiceAccountCredentials
 from gcloud import storage
 
 
@@ -26,7 +27,12 @@ class Firebase():
         self.auth_domain = config["authDomain"]
         self.database_url = config["databaseURL"]
         self.storage_bucket = config["storageBucket"]
-        self.service_account = config["serviceAccount"]
+        self.adminToken = None
+        if config.get("serviceAccount"):
+            self.service_account = config["serviceAccount"]
+            scopes = ['https://www.googleapis.com/auth/firebase.database','https://www.googleapis.com/auth/userinfo.email']
+            credentials = ServiceAccountCredentials.from_json_keyfile_name(config["serviceAccount"], scopes)
+            self.adminToken = credentials.get_access_token()
         self.requests = requests.Session()
         adapter = requests.adapters.HTTPAdapter(max_retries=3)
         for scheme in ('http://', 'https://'):
@@ -36,7 +42,7 @@ class Firebase():
         return Auth(self.api_key, self.requests)
 
     def database(self):
-        return Database(self.api_key, self.database_url, self.requests)
+        return Database(self.adminToken, self.api_key, self.database_url, self.requests)
 
     def storage(self):
         return Storage(self.storage_bucket, self.service_account)
@@ -101,13 +107,14 @@ class Auth():
 
 class Database():
     """ Database Interface """
-    def __init__(self, api_key, database_url, requests):
+    def __init__(self, adminToken, api_key, database_url, requests):
 
         if not database_url.endswith('/'):
             url = ''.join([database_url, '/'])
         else:
             url = database_url
 
+        self.adminToken = adminToken
         self.api_key = api_key
         self.database_url = url
         self.requests = requests
@@ -170,12 +177,20 @@ class Database():
         self.build_query = {}
         return request_ref
 
+    def build_headers(self, token):
+        headers = {"content-type": "application/json; charset=UTF-8" }
+        if not token and self.adminToken:
+            headers['Authorization'] = 'Bearer ' + self.adminToken.access_token
+        return headers
+
     def get(self, token=None):
         build_query = self.build_query
         query_key = self.path.split("/")[-1]
         request_ref = self.build_request_url(token)
+        # headers
+        headers = self.build_headers(token)
         # do request
-        request_object = self.requests.get(request_ref)
+        request_object = self.requests.get(request_ref, headers=headers)
         try:
             request_object.raise_for_status()
         except HTTPError as e:
@@ -183,6 +198,7 @@ class Database():
             raise HTTPError(e, request_object.text)
 
         request_dict = request_object.json()
+
         # if primitive or simple query return
         if not isinstance(request_dict, dict):
             return PyreResponse(request_dict, query_key)
@@ -203,26 +219,29 @@ class Database():
     def push(self, data, token=None):
         request_ref = self.check_token(self.database_url, self.path, token)
         self.path = ""
-        headers = {"content-type": "application/json; charset=UTF-8" }
+        headers = self.build_headers(token)
         request_object = self.requests.post(request_ref, headers=headers, data=json.dumps(data))
         return request_object.json()
 
     def set(self, data, token=None):
         request_ref = self.check_token(self.database_url, self.path, token)
         self.path = ""
-        request_object = self.requests.put(request_ref, data=json.dumps(data))
+        headers = self.build_headers(token)
+        request_object = self.requests.put(request_ref, headers=headers, data=json.dumps(data))
         return request_object.json()
 
     def update(self, data, token=None):
         request_ref = self.check_token(self.database_url, self.path, token)
         self.path = ""
-        request_object = self.requests.patch(request_ref, data=json.dumps(data))
+        headers = self.build_headers(token)
+        request_object = self.requests.patch(request_ref, headers=headers, data=json.dumps(data))
         return request_object.json()
 
     def remove(self, token=None):
         request_ref = self.check_token(self.database_url, self.path, token)
         self.path = ""
-        request_object = self.requests.delete(request_ref)
+        headers = self.build_headers(token)
+        request_object = self.requests.delete(request_ref, headers=headers)
         return request_object.json()
 
     def stream(self, stream_handler, token=None):
