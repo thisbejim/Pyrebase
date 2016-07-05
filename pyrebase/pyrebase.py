@@ -27,12 +27,17 @@ class Firebase():
         self.auth_domain = config["authDomain"]
         self.database_url = config["databaseURL"]
         self.storage_bucket = config["storageBucket"]
-        self.adminToken = None
+        self.credentials = None
+        self.access_token = None
         if config.get("serviceAccount"):
             self.service_account = config["serviceAccount"]
-            scopes = ['https://www.googleapis.com/auth/firebase.database','https://www.googleapis.com/auth/userinfo.email']
-            credentials = ServiceAccountCredentials.from_json_keyfile_name(config["serviceAccount"], scopes)
-            self.adminToken = credentials.get_access_token()
+            scopes = [
+                'https://www.googleapis.com/auth/firebase.database',
+                'https://www.googleapis.com/auth/userinfo.email',
+                "https://www.googleapis.com/auth/cloud-platform"
+            ]
+            self.credentials = ServiceAccountCredentials.from_json_keyfile_name(config["serviceAccount"], scopes)
+            self.access_token = self.credentials.get_access_token()
         self.requests = requests.Session()
         adapter = requests.adapters.HTTPAdapter(max_retries=3)
         for scheme in ('http://', 'https://'):
@@ -42,10 +47,10 @@ class Firebase():
         return Auth(self.api_key, self.requests)
 
     def database(self):
-        return Database(self.adminToken, self.api_key, self.database_url, self.requests)
+        return Database(self.access_token, self.api_key, self.database_url, self.requests)
 
     def storage(self):
-        return Storage(self.storage_bucket, self.service_account)
+        return Storage(self.credentials, self.storage_bucket, self.requests)
 
 
 class Auth():
@@ -107,14 +112,14 @@ class Auth():
 
 class Database():
     """ Database Interface """
-    def __init__(self, adminToken, api_key, database_url, requests):
+    def __init__(self, access_token, api_key, database_url, requests):
 
         if not database_url.endswith('/'):
             url = ''.join([database_url, '/'])
         else:
             url = database_url
 
-        self.adminToken = adminToken
+        self.access_token = access_token
         self.api_key = api_key
         self.database_url = url
         self.requests = requests
@@ -179,8 +184,8 @@ class Database():
 
     def build_headers(self, token):
         headers = {"content-type": "application/json; charset=UTF-8" }
-        if not token and self.adminToken:
-            headers['Authorization'] = 'Bearer ' + self.adminToken.access_token
+        if not token and self.access_token:
+            headers['Authorization'] = 'Bearer ' + self.access_token.access_token
         return headers
 
     def get(self, token=None):
@@ -288,19 +293,49 @@ class Database():
 
 
 class Storage():
-    def __init__(self, storage_bucket, service_account):
-        client = storage.Client.from_service_account_json(service_account, storage_bucket)
-        self.bucket = client.get_bucket(storage_bucket)
+    def __init__(self, credentials, storage_bucket, requests):
+        self.storage_bucket = "https://firebasestorage.googleapis.com/v0/b/" + storage_bucket
+        self.credentials = credentials
+        self.requests = requests
+        self.path = ""
+        if credentials:
+            client = storage.Client(credentials=credentials, project=storage_bucket)
+            self.bucket = client.get_bucket(storage_bucket)
 
-    def put(self, file_path, file_name):
-        blob = self.bucket.blob(file_name)
-        blob.upload_from_filename(filename=file_path, uploadType="resumable")
+    def child(self, *args):
+        new_path = "/".join(args)
+        if self.path:
+            self.path += "/{}".format(new_path)
+        else:
+            if new_path.startswith("/"):
+                new_path = new_path[1:]
+            self.path = new_path
+        return self
+
+    def put(self, file_name, token=None):
+        # reset path
+        path = self.path
+        self.path = None
+        if token:
+            file = open(file_name, 'rb')
+            request_ref = self.storage_bucket + "/o?name={0}".format(path)
+            headers = {"Authorization": "Firebase "+token}
+            request_object = self.requests.put(request_ref, headers=headers, data=file)
+            return request_object.json()
+        elif self.credentials:
+            blob = self.bucket.blob(path)
+            return blob.upload_from_filename(filename=file_name)
 
     def delete(self, name):
         self.bucket.delete_blob(name)
 
-    def get(self, name):
-        return self.bucket.get_blob(name)
+    def get(self):
+        # remove leading backlash
+        path = self.path
+        self.path = None
+        if path.startswith('/'):
+            path = path[1:]
+        return self.bucket.get_blob(path)
 
     def list_files(self):
         return self.bucket.list_blobs()

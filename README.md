@@ -311,13 +311,24 @@ This query returns the first five users ordered by score.
 
 The storage service allows you to upload images to Firebase.
 
+### child
+
+Just like with the Database service, you can build paths to your data with the Storage service.
+
+```python
+storage.child("images/example.jpg")
+```
+
 ### put
 
-The put method takes the path to the local file, the path/name you want your file to have in storage, and a token.
+The put method takes the path to the local file and an optional user token.
 
 ```python
 storage = firebase.storage()
-storage.put('example.jpg', "images/example.jpg", user['idToken'])
+# as admin
+storage.child("images/example.jpg").put("example2.jpg")
+# as user
+storage.child("images/example.jpg").put("example2.jpg", user['idToken'])
 ```
 
 ### Helper Methods
