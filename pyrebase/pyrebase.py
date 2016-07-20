@@ -420,7 +420,7 @@ class Stream:
         for msg in self.sse:
             msg_data = json.loads(msg.data)
             # don't return initial data
-            if msg_data and msg_data['path'] != '/':
+            if msg_data:
                 msg_data["event"] = msg.event
                 stream_handler(msg_data)
 
