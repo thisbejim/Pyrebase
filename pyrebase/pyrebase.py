@@ -20,7 +20,7 @@ def initialize_app(config):
     return Firebase(config)
 
 
-class Firebase():
+class Firebase:
     """ Firebase Interface """
     def __init__(self, config):
         self.api_key = config["apiKey"]
@@ -53,8 +53,8 @@ class Firebase():
         return Storage(self.credentials, self.storage_bucket, self.requests)
 
 
-class Auth():
-    """ Auth Interface """
+class Auth:
+    """ Authentication Service """
     def __init__(self, api_key, requests):
         self.api_key = api_key
         self.current_user = None
@@ -65,7 +65,7 @@ class Auth():
         headers = {"content-type": "application/json; charset=UTF-8"}
         data = json.dumps({"email": email, "password": password, "returnSecureToken": True})
         request_object = requests.post(request_ref, headers=headers, data=data)
-        request_object.raise_for_status()
+        raise_detailed_error(request_object)
         self.current_user = request_object.json()
         return request_object.json()
 
@@ -74,7 +74,7 @@ class Auth():
         headers = {"content-type": "application/json; charset=UTF-8"}
         data = json.dumps({"idToken": id_token})
         request_object = requests.post(request_ref, headers=headers, data=data)
-        request_object.raise_for_status()
+        raise_detailed_error(request_object)
         return request_object.json()
 
     def send_email_verification(self, id_token):
@@ -82,7 +82,7 @@ class Auth():
         headers = {"content-type": "application/json; charset=UTF-8"}
         data = json.dumps({"requestType": "VERIFY_EMAIL", "idToken": id_token})
         request_object = requests.post(request_ref, headers=headers, data=data)
-        request_object.raise_for_status()
+        raise_detailed_error(request_object)
         return request_object.json()
 
     def send_password_reset_email(self, email):
@@ -90,7 +90,7 @@ class Auth():
         headers = {"content-type": "application/json; charset=UTF-8"}
         data = json.dumps({"requestType": "PASSWORD_RESET", "email": email})
         request_object = requests.post(request_ref, headers=headers, data=data)
-        request_object.raise_for_status()
+        raise_detailed_error(request_object)
         return request_object.json()
 
     def verify_password_reset_code(self, reset_code, new_password):
@@ -98,7 +98,7 @@ class Auth():
         headers = {"content-type": "application/json; charset=UTF-8"}
         data = json.dumps({"oobCode": reset_code, "newPassword": new_password})
         request_object = requests.post(request_ref, headers=headers, data=data)
-        request_object.raise_for_status()
+        raise_detailed_error(request_object)
         return request_object.json()
 
     def create_user_with_email_and_password(self, email, password):
@@ -106,12 +106,12 @@ class Auth():
         headers = {"content-type": "application/json; charset=UTF-8" }
         data = json.dumps({"email": email, "password": password, "returnSecureToken": True})
         request_object = requests.post(request_ref, headers=headers, data=data)
-        request_object.raise_for_status()
+        raise_detailed_error(request_object)
         return request_object.json()
 
 
-class Database():
-    """ Database Interface """
+class Database:
+    """ Database Service """
     def __init__(self, access_token, api_key, database_url, requests):
 
         if not database_url.endswith('/'):
@@ -196,12 +196,7 @@ class Database():
         headers = self.build_headers(token)
         # do request
         request_object = self.requests.get(request_ref, headers=headers)
-        try:
-            request_object.raise_for_status()
-        except HTTPError as e:
-            # raise detailed error message
-            raise HTTPError(e, request_object.text)
-
+        raise_detailed_error(request_object)
         request_dict = request_object.json()
 
         # if primitive or simple query return
@@ -226,6 +221,7 @@ class Database():
         self.path = ""
         headers = self.build_headers(token)
         request_object = self.requests.post(request_ref, headers=headers, data=json.dumps(data))
+        raise_detailed_error(request_object)
         return request_object.json()
 
     def set(self, data, token=None):
@@ -233,6 +229,7 @@ class Database():
         self.path = ""
         headers = self.build_headers(token)
         request_object = self.requests.put(request_ref, headers=headers, data=json.dumps(data))
+        raise_detailed_error(request_object)
         return request_object.json()
 
     def update(self, data, token=None):
@@ -240,6 +237,7 @@ class Database():
         self.path = ""
         headers = self.build_headers(token)
         request_object = self.requests.patch(request_ref, headers=headers, data=json.dumps(data))
+        raise_detailed_error(request_object)
         return request_object.json()
 
     def remove(self, token=None):
@@ -247,6 +245,7 @@ class Database():
         self.path = ""
         headers = self.build_headers(token)
         request_object = self.requests.delete(request_ref, headers=headers)
+        raise_detailed_error(request_object)
         return request_object.json()
 
     def stream(self, stream_handler, token=None):
@@ -292,7 +291,8 @@ class Database():
         return PyreResponse(convert_to_pyre(data), origin.key())
 
 
-class Storage():
+class Storage:
+    """ Storage Service """
     def __init__(self, credentials, storage_bucket, requests):
         self.storage_bucket = "https://firebasestorage.googleapis.com/v0/b/" + storage_bucket
         self.credentials = credentials
@@ -321,6 +321,7 @@ class Storage():
             request_ref = self.storage_bucket + "/o?name={0}".format(path)
             headers = {"Authorization": "Firebase "+token}
             request_object = self.requests.put(request_ref, headers=headers, data=file)
+            raise_detailed_error(request_object)
             return request_object.json()
         elif self.credentials:
             blob = self.bucket.blob(path)
@@ -339,6 +340,14 @@ class Storage():
 
     def list_files(self):
         return self.bucket.list_blobs()
+
+
+def raise_detailed_error(request_object):
+    try:
+        request_object.raise_for_status()
+    except HTTPError as e:
+        # raise detailed error message
+        raise HTTPError(e, request_object.text)
 
 
 def convert_to_pyre(items):
