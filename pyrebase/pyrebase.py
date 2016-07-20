@@ -312,20 +312,26 @@ class Storage:
             self.path = new_path
         return self
 
-    def put(self, file_name, token=None):
+    def put(self, file, token=None):
         # reset path
         path = self.path
         self.path = None
         if token:
-            file = open(file_name, 'rb')
+            if isinstance(file, str):
+                file_object = open(file, 'rb')
+            else:
+                file_object = file
             request_ref = self.storage_bucket + "/o?name={0}".format(path)
             headers = {"Authorization": "Firebase "+token}
-            request_object = self.requests.put(request_ref, headers=headers, data=file)
+            request_object = self.requests.put(request_ref, headers=headers, data=file_object)
             raise_detailed_error(request_object)
             return request_object.json()
         elif self.credentials:
             blob = self.bucket.blob(path)
-            return blob.upload_from_filename(filename=file_name)
+            if isinstance(file, str):
+                return blob.upload_from_filename(filename=file)
+            else:
+                return blob.upload_from_file(file_obj=file)
 
     def delete(self, name):
         self.bucket.delete_blob(name)
