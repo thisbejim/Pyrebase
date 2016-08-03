@@ -7,4 +7,4 @@ Make sure these boxes are checked before submitting your issue:
 Please don't be discouraged if you do not get a response to your issue quickly,
 I maintain Pyrebase for fun and don't always have as much free time as I'd like.
 
-Thank you for helping make Pyrebase a better!
+Thank you for helping make Pyrebase better!
