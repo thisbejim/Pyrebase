@@ -220,7 +220,7 @@ class Database:
         request_ref = self.check_token(self.database_url, self.path, token)
         self.path = ""
         headers = self.build_headers(token)
-        request_object = self.requests.post(request_ref, headers=headers, data=json.dumps(data))
+        request_object = self.requests.post(request_ref, headers=headers, data=json.dumps(data).encode("utf-8"))
         raise_detailed_error(request_object)
         return request_object.json()
 
@@ -228,7 +228,7 @@ class Database:
         request_ref = self.check_token(self.database_url, self.path, token)
         self.path = ""
         headers = self.build_headers(token)
-        request_object = self.requests.put(request_ref, headers=headers, data=json.dumps(data))
+        request_object = self.requests.put(request_ref, headers=headers, data=json.dumps(data).encode("utf-8"))
         raise_detailed_error(request_object)
         return request_object.json()
 
@@ -236,7 +236,7 @@ class Database:
         request_ref = self.check_token(self.database_url, self.path, token)
         self.path = ""
         headers = self.build_headers(token)
-        request_object = self.requests.patch(request_ref, headers=headers, data=json.dumps(data))
+        request_object = self.requests.patch(request_ref, headers=headers, data=json.dumps(data).encode("utf-8"))
         raise_detailed_error(request_object)
         return request_object.json()
 
