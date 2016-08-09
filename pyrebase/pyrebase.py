@@ -28,7 +28,6 @@ class Firebase:
         self.database_url = config["databaseURL"]
         self.storage_bucket = config["storageBucket"]
         self.credentials = None
-        self.access_token = None
         if config.get("serviceAccount"):
             self.service_account = config["serviceAccount"]
             scopes = [
@@ -37,7 +36,6 @@ class Firebase:
                 "https://www.googleapis.com/auth/cloud-platform"
             ]
             self.credentials = ServiceAccountCredentials.from_json_keyfile_name(config["serviceAccount"], scopes)
-            self.access_token = self.credentials.get_access_token()
         self.requests = requests.Session()
         adapter = requests.adapters.HTTPAdapter(max_retries=3)
         for scheme in ('http://', 'https://'):
@@ -47,7 +45,7 @@ class Firebase:
         return Auth(self.api_key, self.requests)
 
     def database(self):
-        return Database(self.access_token, self.api_key, self.database_url, self.requests)
+        return Database(self.credentials, self.api_key, self.database_url, self.requests)
 
     def storage(self):
         return Storage(self.credentials, self.storage_bucket, self.requests)
@@ -112,14 +110,14 @@ class Auth:
 
 class Database:
     """ Database Service """
-    def __init__(self, access_token, api_key, database_url, requests):
+    def __init__(self, credentials, api_key, database_url, requests):
 
         if not database_url.endswith('/'):
             url = ''.join([database_url, '/'])
         else:
             url = database_url
 
-        self.access_token = access_token
+        self.credentials = credentials
         self.api_key = api_key
         self.database_url = url
         self.requests = requests
@@ -184,8 +182,8 @@ class Database:
 
     def build_headers(self, token):
         headers = {"content-type": "application/json; charset=UTF-8" }
-        if not token and self.access_token:
-            headers['Authorization'] = 'Bearer ' + self.access_token.access_token
+        if not token and self.credentials:
+            headers['Authorization'] = 'Bearer ' + self.credentials.get_access_token().access_token
         return headers
 
     def get(self, token=None):

@@ -5,7 +5,7 @@ build
 dist
 test.py
 run.py
-castsub.json
+socialbot.json
 __pycache__
 *.pyc
 pyrebase.py.orig
