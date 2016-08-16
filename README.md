@@ -106,7 +106,7 @@ Note: Make sure you have the Email/password provider enabled in your Firebase da
 #### Verifying emails
 
 ```python
-auth.send_email_verification(email)
+auth.send_email_verification(user['idToken'])
 ```
 
 #### Sending password reset emails
