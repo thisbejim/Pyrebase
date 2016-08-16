@@ -142,7 +142,7 @@ db.child("users").push(data)
 
 #### set
 
-To create your own keys use the ```set()``` method. The key in the example below is "Marty".
+To create your own keys use the ```set()``` method. The key in the example below is "Morty".
 
 ```python
 data = {"Morty": {"name": "Mortimer 'Morty' Smith"}}
