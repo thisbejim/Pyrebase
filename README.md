@@ -106,7 +106,7 @@ Note: Make sure you have the Email/password provider enabled in your Firebase da
 #### Verifying emails
 
 ```python
-auth.send_email_verification(email)
+auth.send_email_verification(user['idToken'])
 ```
 
 #### Sending password reset emails
@@ -142,7 +142,7 @@ db.child("users").push(data)
 
 #### set
 
-To create your own keys use the ```set()``` method. The key in the example below is "Marty".
+To create your own keys use the ```set()``` method. The key in the example below is "Morty".
 
 ```python
 data = {"Morty": {"name": "Mortimer 'Morty' Smith"}}
