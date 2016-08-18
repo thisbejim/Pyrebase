@@ -120,6 +120,11 @@ auth.send_password_reset_email("email")
 auth.get_account_info(user['idToken'])
 ```
 
+#### Refreshing tokens
+```python
+user = auth.refresh(user['refreshToken'])
+```
+
 ## Database
 
 You can build paths to your data by using the ```child()``` method.
