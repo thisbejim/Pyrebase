@@ -84,12 +84,16 @@ data = {
 results = db.child("users").child("Morty").update(data, user['idToken'])
 ```
 
-You can also create users using custom tokens, for example:
+You can also create users using [custom tokens](https://firebase.google.com/docs/auth/server/create-custom-tokens), for example:
 ```
 token = auth.create_custom_token("your_custom_id")
-# you can also pass in additional claims
+```
+You can also pass in additional claims.
+```
 token_with_additional_claims = auth.create_custom_token("your_custom_id", {"premium_account": True})
-# you can then send these tokens to the client to sign in, or sign in as the user on the server
+```
+You can then send these tokens to the client to sign in, or sign in as the user on the server.
+```
 user = auth.sign_in_with_custom_token(token)
 ```
 
