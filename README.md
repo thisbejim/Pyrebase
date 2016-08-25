@@ -94,6 +94,13 @@ data = {
 results = db.child("users").child("Morty").update(data, user['idToken'])
 ```
 
+You can also create users using custom tokens, for example:
+```
+token = auth.create_custom_token("your_custom_id", False)
+# you can then send these tokens to the client to sign in, or sign in as the user on the server
+user = auth.sign_in_with_custom_token(token)
+```
+
 ### Manage Users
 
 #### Creating users

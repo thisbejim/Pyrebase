@@ -17,6 +17,11 @@ from gcloud import storage
 from requests.packages.urllib3.contrib.appengine import is_appengine_sandbox
 from requests_toolbelt.adapters import appengine
 
+import jwt
+import Crypto.PublicKey.RSA as RSA
+import datetime
+
+
 def initialize_app(config):
     return Firebase(config)
 
@@ -29,6 +34,7 @@ class Firebase:
         self.database_url = config["databaseURL"]
         self.storage_bucket = config["storageBucket"]
         self.credentials = None
+        self.requests = requests.Session()
         if config.get("serviceAccount"):
             self.service_account = config["serviceAccount"]
             scopes = [
@@ -37,8 +43,6 @@ class Firebase:
                 "https://www.googleapis.com/auth/cloud-platform"
             ]
             self.credentials = ServiceAccountCredentials.from_json_keyfile_name(config["serviceAccount"], scopes)
-        self.requests = requests.Session()
-
         if is_appengine_sandbox():
             # Fix error in standard GAE environment
             # is releated to https://github.com/kennethreitz/requests/issues/3187
@@ -51,7 +55,7 @@ class Firebase:
             self.requests.mount(scheme, adapter)
 
     def auth(self):
-        return Auth(self.api_key, self.requests)
+        return Auth(self.api_key, self.requests, self.credentials)
 
     def database(self):
         return Database(self.credentials, self.api_key, self.database_url, self.requests)
@@ -62,10 +66,11 @@ class Firebase:
 
 class Auth:
     """ Authentication Service """
-    def __init__(self, api_key, requests):
+    def __init__(self, api_key, requests, credentials):
         self.api_key = api_key
         self.current_user = None
         self.requests = requests
+        self.credentials = credentials
 
     def sign_in_with_email_and_password(self, email, password):
         request_ref = "https://www.googleapis.com/identitytoolkit/v3/relyingparty/verifyPassword?key={0}".format(self.api_key)
@@ -76,6 +81,29 @@ class Auth:
         self.current_user = request_object.json()
         return request_object.json()
 
+    def create_custom_token(self, uid, is_premium_account):
+        service_account_email = self.credentials.service_account_email
+        private_key = RSA.importKey(self.credentials._private_key_pkcs8_pem)
+        payload = {
+            "iss": service_account_email,
+            "sub": service_account_email,
+            "aud": "https://identitytoolkit.googleapis.com/google.identity.identitytoolkit.v1.IdentityToolkit",
+            "uid": uid,
+            "claims": {
+                "premium_account": is_premium_account
+            }
+        }
+        exp = datetime.timedelta(minutes=60)
+        return jwt.generate_jwt(payload, private_key, "RS256", exp)
+
+    def sign_in_with_custom_token(self, token):
+        request_ref = "https://www.googleapis.com/identitytoolkit/v3/relyingparty/verifyCustomToken?key={0}".format(self.api_key)
+        headers = {"content-type": "application/json; charset=UTF-8"}
+        data = json.dumps({"returnSecureToken": True, "token": token})
+        request_object = requests.post(request_ref, headers=headers, data=data)
+        raise_detailed_error(request_object)
+        return request_object.json()
+
     def refresh(self, refresh_token):
         request_ref = "https://securetoken.googleapis.com/v1/token?key={0}".format(self.api_key)
         headers = {"content-type": "application/json; charset=UTF-8"}
@@ -83,7 +111,7 @@ class Auth:
         request_object = requests.post(request_ref, headers=headers, data=data)
         raise_detailed_error(request_object)
         request_object_json = request_object.json()
-        # handle weirdly differently formatted response
+        # handle weirdly formatted response
         user = {
             "userId": request_object_json["user_id"],
             "idToken": request_object_json["id_token"],
