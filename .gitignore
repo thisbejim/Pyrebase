@@ -4,6 +4,7 @@ Pyrebase.egg-info
 build
 dist
 test.py
+test.png
 run.py
 socialbot.json
 __pycache__

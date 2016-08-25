@@ -339,6 +339,23 @@ storage.child("images/example.jpg").put("example2.jpg")
 storage.child("images/example.jpg").put("example2.jpg", user['idToken'])
 ```
 
+### download
+
+The download method takes the path to the saved database file and the name you want the downloaded file to have.
+
+```
+storage.child("images/example.jpg").download("downloaded.jpg")
+```
+
+### get_url
+
+The get_url method takes the path to the saved database file and returns the storage url.
+
+```
+storage.child("images/example.jpg").get_url()
+# https://firebasestorage.googleapis.com/v0/b/storage-url.appspot.com/o/images%2Fexample.jpg?alt=media
+```
+
 ### Helper Methods
 
 #### generate_key

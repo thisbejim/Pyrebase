@@ -371,7 +371,7 @@ class Storage:
             else:
                 file_object = file
             request_ref = self.storage_bucket + "/o?name={0}".format(path)
-            headers = {"Authorization": "Firebase "+token}
+            headers = {"Authorization": "Firebase " + token}
             request_object = self.requests.put(request_ref, headers=headers, data=file_object)
             raise_detailed_error(request_object)
             return request_object.json()
@@ -385,13 +385,21 @@ class Storage:
     def delete(self, name):
         self.bucket.delete_blob(name)
 
-    def get(self):
+    def download(self, filename):
         # remove leading backlash
         path = self.path
         self.path = None
         if path.startswith('/'):
             path = path[1:]
-        return self.bucket.get_blob(path)
+        blob = self.bucket.get_blob(path)
+        blob.download_to_filename(filename)
+
+    def get_url(self):
+        path = self.path
+        self.path = None
+        if path.startswith('/'):
+            path = path[1:]
+        return "{0}/o/{1}?alt=media".format(self.storage_bucket, quote(path, safe=''))
 
     def list_files(self):
         return self.bucket.list_blobs()
