@@ -249,6 +249,8 @@ class Database:
         request_dict = request_object.json()
 
         # if primitive or simple query return
+        if isinstance(request_dict, list):
+            return PyreResponse(convert_list_to_pyre(request_dict), query_key)
         if not isinstance(request_dict, dict):
             return PyreResponse(request_dict, query_key)
         if not build_query:
@@ -420,6 +422,13 @@ def convert_to_pyre(items):
     return pyre_list
 
 
+def convert_list_to_pyre(items):
+    pyre_list = []
+    for item in items:
+        pyre_list.append(Pyre([items.index(item), item]))
+    return pyre_list
+
+
 class PyreResponse:
     def __init__(self, pyres, query_key):
         self.pyres = pyres
@@ -429,6 +438,12 @@ class PyreResponse:
         if isinstance(self.pyres, list):
             # unpack pyres into OrderedDict
             pyre_list = []
+            # if firebase response was a list
+            if isinstance(self.pyres[0].key(), int):
+                for pyre in self.pyres:
+                    pyre_list.append(pyre.val())
+                return pyre_list
+            # if firebase response was a dict with keys
             for pyre in self.pyres:
                 pyre_list.append((pyre.key(), pyre.val()))
             return OrderedDict(pyre_list)
