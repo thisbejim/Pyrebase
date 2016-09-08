@@ -273,25 +273,35 @@ my_stream.close()
 Queries can be built by chaining multiple query parameters together.
 
 ```python
-users_by_name = db.child("users").order_by_child("name").limit_to_first(3).get()
+users_by_name = db.child("users").order_by("name").limit_to_first(3).get()
 ```
 This query will return the first three users ordered by name.
 
-#### order_by_child
+#### order_by
 
-We begin any complex query with ```order_by_child()```.
+We begin any complex query with ```order_by()```.
 
 ```python
-users_by_name = db.child("users").order_by_child("name").get()
+users_by_name = db.child("users").order_by("name").get()
 ```
-This query will return users ordered by name.
+This query will return users ordered by child name.
+
+```python
+users_by_name = db.child("users").order_by("$key").get()
+```
+This query will return users ordered by key.
+
+```python
+users_by_name = db.child("users").order_by("$value").get()
+```
+This query will return users ordered by value.
 
 #### equal_to
 
 Return data with a specific value.
 
 ```python
-users_by_score = db.child("users").order_by_child("score").equal_to(10).get()
+users_by_score = db.child("users").order_by("score").equal_to(10).get()
 ```
 This query will return users with a score of 10.
 
@@ -300,7 +310,7 @@ This query will return users with a score of 10.
 Specify a range in your data.
 
 ```python
-users_by_score = db.child("users").order_by_child("score").start_at(3).end_at(10).get()
+users_by_score = db.child("users").order_by("score").start_at(3).end_at(10).get()
 ```
 This query returns users ordered by score and with a score between 3 and 10.
 
@@ -309,7 +319,7 @@ This query returns users ordered by score and with a score between 3 and 10.
 Limits data returned.
 
 ```python
-users_by_score = db.child("users").order_by_child("score").limit_to_first(5).get()
+users_by_score = db.child("users").order_by("score").limit_to_first(5).get()
 ```
 This query returns the first five users ordered by score.
 
@@ -370,7 +380,7 @@ certain date then sort those articles based on the number of likes.
 Currently the REST API only allows us to sort our data once, so the ```sort()``` method bridges this gap.
 
 ```python
-articles = db.child("articles").order_by_child("date").start_at(startDate).end_at(endDate).get()
+articles = db.child("articles").order_by("date").start_at(startDate).end_at(endDate).get()
 articles_by_likes = db.sort(articles, "likes")
 ```
 
