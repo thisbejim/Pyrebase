@@ -207,7 +207,7 @@ class Database:
         return self
 
     def child(self, *args):
-        new_path = "/".join(args)
+        new_path = "/".join([str(arg) for arg in args])
         if self.path:
             self.path += "/{}".format(new_path)
         else:
