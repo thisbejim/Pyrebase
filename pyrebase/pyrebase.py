@@ -263,6 +263,10 @@ class Database:
         if build_query.get("orderBy"):
             if build_query["orderBy"] == "$key":
                 sorted_response = sorted(request_dict.items(), key=lambda item: item[0])
+            # Patched for order by priority. We don't receive priority from Firebase, so we cannot order here.
+            # We also don't want the application to crash, so this exception is here.
+            elif build_query["orderBy"] == "$priority":
+                sorted_response = request_dict.items()
             else:
                 sorted_response = sorted(request_dict.items(), key=lambda item: item[1][build_query["orderBy"]])
         return PyreResponse(convert_to_pyre(sorted_response), query_key)
