@@ -180,6 +180,14 @@ class Database:
         self.last_push_time = 0
         self.last_rand_chars = []
 
+    def order_by_key(self):
+        self.build_query["orderBy"] = "$key"
+        return self
+
+     def order_by_value(self):
+        self.build_query["orderBy"] = "$value"
+        return self
+
     def order_by_child(self, order):
         self.build_query["orderBy"] = order
         return self
@@ -265,6 +273,8 @@ class Database:
         if build_query.get("orderBy"):
             if build_query["orderBy"] == "$key":
                 sorted_response = sorted(request_dict.items(), key=lambda item: item[0])
+            elif build_query["orderBy"] == "$value":
+                sorted_response = sorted(request_dict.items(), key=lambda item: item[1])
             else:
                 sorted_response = sorted(request_dict.items(), key=lambda item: item[1][build_query["orderBy"]])
         return PyreResponse(convert_to_pyre(sorted_response), query_key)
