@@ -543,6 +543,8 @@ class Stream:
                 stream_handler(msg_data)
 
     def close(self):
+        while not self.sse:
+            pass
         self.sse.close()
         self.thread.join()
         return self
