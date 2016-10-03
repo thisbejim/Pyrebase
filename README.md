@@ -313,6 +313,23 @@ users_by_score = db.child("users").order_by_child("score").limit_to_first(5).get
 ```
 This query returns the first five users ordered by score.
 
+#### order_by_key
+
+When using ```order_by_key()``` to sort your data, data is returned in ascending order by key.
+
+```python
+users_by_key = db.child("users").order_by_key().get()
+```
+
+#### order_by_value
+
+When using ```order_by_value()```, children are ordered by their value.
+
+```python
+users_by_value = db.child("users").order_by_value().get()
+```
+
+
 ## Storage
 
 The storage service allows you to upload images to Firebase.
