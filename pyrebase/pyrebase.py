@@ -1,5 +1,7 @@
 import requests
+from requests import Session
 from requests.exceptions import HTTPError
+
 try:
     from urllib.parse import urlencode, quote
 except:
@@ -232,7 +234,7 @@ class Database:
         return request_ref
 
     def build_headers(self, token):
-        headers = {"content-type": "application/json; charset=UTF-8" }
+        headers = {"content-type": "application/json; charset=UTF-8"}
         if not token and self.credentials:
             headers['Authorization'] = 'Bearer ' + self.credentials.get_access_token().access_token
         return headers
@@ -301,7 +303,8 @@ class Database:
 
     def stream(self, stream_handler, token=None):
         request_ref = self.build_request_url(token)
-        return Stream(request_ref, stream_handler)
+        headers = self.build_headers(token)
+        return Stream(request_ref, headers, stream_handler)
 
     def check_token(self, database_url, path, token):
         if token:
@@ -470,6 +473,15 @@ class Pyre:
         return self.item[0]
 
 
+class KeepAuthSession(Session):
+    """
+    A session that doesn't drop Authentication on redirects between domains.
+    """
+
+    def rebuild_auth(self, prepared_request, response):
+        pass
+
+
 class ClosableSSEClient(SSEClient):
     def __init__(self, *args, **kwargs):
         self.should_connect = True
@@ -489,12 +501,21 @@ class ClosableSSEClient(SSEClient):
 
 
 class Stream:
-    def __init__(self, url, stream_handler):
+    def __init__(self, url, headers, stream_handler):
+        self.headers = headers
         self.url = url
         self.stream_handler = stream_handler
         self.sse = None
         self.thread = None
         self.start()
+
+    def make_session(self):
+        """
+        Return a custom session object to be passed to the ClosableSSEClient.
+        """
+        session = KeepAuthSession()
+        session.headers.update(self.headers)
+        return session
 
     def start(self):
         self.thread = threading.Thread(target=self.start_stream,
@@ -503,7 +524,7 @@ class Stream:
         return self
 
     def start_stream(self, url, stream_handler):
-        self.sse = ClosableSSEClient(url)
+        self.sse = ClosableSSEClient(url, session=self.make_session())
         for msg in self.sse:
             msg_data = json.loads(msg.data)
             # don't return initial data
