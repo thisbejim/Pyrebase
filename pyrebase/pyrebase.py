@@ -184,7 +184,7 @@ class Database:
         self.build_query["orderBy"] = "$key"
         return self
 
-     def order_by_value(self):
+    def order_by_value(self):
         self.build_query["orderBy"] = "$value"
         return self
 
