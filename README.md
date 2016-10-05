@@ -51,6 +51,25 @@ firebase = pyrebase.initialize_app(config)
 Adding a service account will authenticate as an admin by default for all database queries, check out the
 [Authentication documentation](#authentication) for how to authenticate users.
 
+You may also pass a JSON string or Python dictionary containing service account credentials using `serviceAccountJson`.
+
+```python
+import pyrebase
+import os
+
+service_account = os.environ['FBASE_SERVICE_ACCOUNT_JSON']
+
+config = {
+  "apiKey": "apiKey",
+  "authDomain": "projectId.firebaseapp.com",
+  "databaseURL": "https://databaseName.firebaseio.com",
+  "storageBucket": "projectId.appspot.com",
+  "serviceAccountJson": service_account
+}
+
+firebase = pyrebase.initialize_app(config)
+```
+
 ### Use Services
 
 A Pyrebase app can use multiple Firebase services.
