@@ -392,7 +392,7 @@ class Storage:
                 file_object = file
             request_ref = self.storage_bucket + "/o?name={0}".format(path)
             headers = {"Authorization": "Firebase " + token}
-            request_object = self.requests.put(request_ref, headers=headers, data=file_object)
+            request_object = self.requests.post(request_ref, headers=headers, data=file_object)
             raise_detailed_error(request_object)
             return request_object.json()
         elif self.credentials:
