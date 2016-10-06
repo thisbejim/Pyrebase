@@ -544,7 +544,7 @@ class Stream:
 
     def close(self):
         while not self.sse:
-            pass
+            time.sleep(0.001)
         self.sse.close()
         self.thread.join()
         return self
