@@ -45,6 +45,14 @@ class Firebase:
                 "https://www.googleapis.com/auth/cloud-platform"
             ]
             self.credentials = ServiceAccountCredentials.from_json_keyfile_name(config["serviceAccount"], scopes)
+        elif config.get("serviceAccountJson"):
+            self.service_account_json = config["serviceAccountJson"]
+            scopes = [
+                'https://www.googleapis.com/auth/firebase.database',
+                'https://www.googleapis.com/auth/userinfo.email',
+                "https://www.googleapis.com/auth/cloud-platform"
+            ]
+            self.credentials = ServiceAccountCredentials.from_json(config["serviceAccountJson"], scopes)
         if is_appengine_sandbox():
             # Fix error in standard GAE environment
             # is releated to https://github.com/kennethreitz/requests/issues/3187
