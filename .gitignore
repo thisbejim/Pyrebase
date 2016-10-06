@@ -6,7 +6,7 @@ dist
 test.py
 test.png
 run.py
-socialbot.json
+pyrebase.json
 __pycache__
 *.pyc
 pyrebase.py.orig
