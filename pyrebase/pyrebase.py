@@ -38,13 +38,16 @@ class Firebase:
         self.credentials = None
         self.requests = requests.Session()
         if config.get("serviceAccount"):
-            self.service_account = config["serviceAccount"]
             scopes = [
                 'https://www.googleapis.com/auth/firebase.database',
                 'https://www.googleapis.com/auth/userinfo.email',
                 "https://www.googleapis.com/auth/cloud-platform"
             ]
-            self.credentials = ServiceAccountCredentials.from_json_keyfile_name(config["serviceAccount"], scopes)
+            service_account_type = type(config["serviceAccount"])
+            if service_account_type is str:
+                self.credentials = ServiceAccountCredentials.from_json_keyfile_name(config["serviceAccount"], scopes)
+            if service_account_type is dict:
+                self.credentials = ServiceAccountCredentials.from_json_keyfile_dict(config["serviceAccount"], scopes)
         if is_appengine_sandbox():
             # Fix error in standard GAE environment
             # is releated to https://github.com/kennethreitz/requests/issues/3187
