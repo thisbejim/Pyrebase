@@ -6,15 +6,10 @@ dist
 test.py
 test.png
 run.py
-pyrebase.json
 __pycache__
 *.pyc
 pyrebase.py.orig
-<<<<<<< HEAD
-=======
-
 /secret.json
 /tests/config.py
 .cache
-sseclient
->>>>>>> 2455a35d1e6713b14f46840a2c2ce5ca0afa341f
+
