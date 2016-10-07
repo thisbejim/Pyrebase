@@ -10,3 +10,7 @@ pyrebase.json
 __pycache__
 *.pyc
 pyrebase.py.orig
+
+/secret.json
+/tests/config.py
+.cache
