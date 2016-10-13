@@ -453,6 +453,9 @@ class PyreResponse:
         if isinstance(self.pyres, list):
             # unpack pyres into OrderedDict
             pyre_list = []
+            # if firebase response was empty
+            if len(self.pyres) == 0:
+                return OrderedDict(pyre_list)
             # if firebase response was a list
             if isinstance(self.pyres[0].key(), int):
                 for pyre in self.pyres:
