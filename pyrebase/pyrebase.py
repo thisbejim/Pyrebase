@@ -20,7 +20,7 @@ from requests.packages.urllib3.contrib.appengine import is_appengine_sandbox
 from requests_toolbelt.adapters import appengine
 
 import python_jwt as jwt
-import Crypto.PublicKey as RSA
+from Crypto.PublicKey import RSA
 import datetime
 
 
@@ -246,7 +246,7 @@ class Database:
         self.build_query = {}
         return request_ref
 
-    def build_headers(self, token):
+    def build_headers(self, token=None):
         headers = {"content-type": "application/json; charset=UTF-8"}
         if not token and self.credentials:
             headers['Authorization'] = 'Bearer ' + self.credentials.get_access_token().access_token
@@ -318,8 +318,7 @@ class Database:
 
     def stream(self, stream_handler, token=None):
         request_ref = self.build_request_url(token)
-        headers = self.build_headers(token)
-        return Stream(request_ref, headers, stream_handler)
+        return Stream(request_ref, stream_handler, self.build_headers)
 
     def check_token(self, database_url, path, token):
         if token:
@@ -522,8 +521,8 @@ class ClosableSSEClient(SSEClient):
 
 
 class Stream:
-    def __init__(self, url, headers, stream_handler):
-        self.headers = headers
+    def __init__(self, url, stream_handler, build_headers):
+        self.build_headers = build_headers
         self.url = url
         self.stream_handler = stream_handler
         self.sse = None
@@ -535,7 +534,6 @@ class Stream:
         Return a custom session object to be passed to the ClosableSSEClient.
         """
         session = KeepAuthSession()
-        session.headers.update(self.headers)
         return session
 
     def start(self):
@@ -545,7 +543,7 @@ class Stream:
         return self
 
     def start_stream(self, url, stream_handler):
-        self.sse = ClosableSSEClient(url, session=self.make_session())
+        self.sse = ClosableSSEClient(url, session=self.make_session(), build_headers=self.build_headers)
         for msg in self.sse:
             msg_data = json.loads(msg.data)
             # don't return initial data
@@ -554,8 +552,10 @@ class Stream:
                 stream_handler(msg_data)
 
     def close(self):
-        while not self.sse:
+        while not self.sse and not hasattr(self.sse, 'resp'):
             time.sleep(0.001)
+        self.sse.running = False
         self.sse.close()
+        self.sse.thread.join()
         self.thread.join()
         return self

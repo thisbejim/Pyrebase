@@ -1,7 +1,7 @@
 import re
 import time
 import warnings
-
+import threading
 import six
 
 import requests
@@ -12,12 +12,16 @@ import requests
 end_of_field = re.compile(r'\r\n\r\n|\r\r|\n\n')
 
 class SSEClient(object):
-    def __init__(self, url, last_id=None, retry=3000, session=None, **kwargs):
+    def __init__(self, url, session, build_headers, last_id=None, retry=3000, **kwargs):
         self.url = url
         self.last_id = last_id
         self.retry = retry
+        self.running = True
         # Optional support for passing in a requests.Session()
         self.session = session
+        # function for building auth header when token expires
+        self.build_headers = build_headers
+        self.start_time = None
         # Any extra kwargs will be fed into the requests.get call later.
         self.requests_kwargs = kwargs
 
@@ -37,7 +41,8 @@ class SSEClient(object):
     def _connect(self):
         if self.last_id:
             self.requests_kwargs['headers']['Last-Event-ID'] = self.last_id
-
+        headers = self.build_headers()
+        self.requests_kwargs['headers'].update(headers)
         # Use session if set.  Otherwise fall back to requests module.
         self.requester = self.session or requests
         self.resp = self.requester.get(self.url, stream=True, **self.requests_kwargs)
@@ -47,6 +52,22 @@ class SSEClient(object):
         # TODO: Ensure we're handling redirects.  Might also stick the 'origin'
         # attribute on Events like the Javascript spec requires.
         self.resp.raise_for_status()
+
+        if not self.start_time:
+            self.thread = threading.Thread(target=self.connect)
+            self.thread.start()
+
+    def connect(self):
+        while self.running:
+            if self.start_time:
+                half_hour_in_seconds = 1800
+                # if it has been a half hour since we started the stream, restart
+                if time.time() - self.start_time > half_hour_in_seconds:
+                    self.start_time = time.time()
+                    self._connect()
+            else:
+                self.start_time = time.time()
+            time.sleep(0.1)
 
     def _event_complete(self):
         return re.search(end_of_field, self.buf) is not None

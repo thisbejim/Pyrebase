@@ -72,15 +72,34 @@ Each of the following methods accepts a user token: ```get()```, ```push()```, `
 ```python
 # Get a reference to the auth service
 auth = firebase.auth()
+
+# Log the user in
 user = auth.sign_in_with_email_and_password(email, password)
 
 # Get a reference to the database service
 db = firebase.database()
+
+# data to save
 data = {
     "name": "Mortimer 'Morty' Smith"
 }
-results = db.child("users").child("Morty").update(data, user['idToken'])
+
+# Pass the user's idToken to the push method
+results = db.child("users").push(data, user['idToken'])
 ```
+
+### Token expiry
+
+A user's idToken expires after 1 hour, so be sure to use the user's refreshToken to avoid stale tokens.
+```
+user = auth.sign_in_with_email_and_password(email, password)
+# before the 1 hour expiry:
+user = auth.refresh(user['refreshToken'])
+# now we have a fresh token
+user['idToken']
+```
+
+### Custom tokens
 
 You can also create users using [custom tokens](https://firebase.google.com/docs/auth/server/create-custom-tokens), for example:
 ```
