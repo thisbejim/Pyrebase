@@ -418,11 +418,13 @@ class Storage:
         blob = self.bucket.get_blob(path)
         blob.download_to_filename(filename)
 
-    def get_url(self):
+    def get_url(self, token):
         path = self.path
         self.path = None
         if path.startswith('/'):
             path = path[1:]
+        if token:
+            return "{0}/o/{1}?alt=media&token={2}".format(self.storage_bucket, quote(path, safe=''), token)
         return "{0}/o/{1}?alt=media".format(self.storage_bucket, quote(path, safe=''))
 
     def list_files(self):
