@@ -19,7 +19,7 @@ from gcloud import storage
 from requests.packages.urllib3.contrib.appengine import is_appengine_sandbox
 from requests_toolbelt.adapters import appengine
 
-import jwt
+import python_jwt as jwt
 import Crypto.PublicKey.RSA as RSA
 import datetime
 
