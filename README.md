@@ -1,4 +1,4 @@
-# Pyrebase  ![downloads](https://stark-waters-86589.herokuapp.com/)
+# Pyrebase  ![downloads](https://stark-waters-86589.herokuapp.com/downloads)
 
 A simple python wrapper for the [Firebase API](https://firebase.google.com).
 
