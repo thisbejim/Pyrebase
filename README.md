@@ -281,6 +281,12 @@ def stream_handler(post):
 my_stream = db.child("posts").stream(stream_handler)
 ```
 
+You can also add a ```stream_id``` to help you identify a stream if you have multiple running:
+
+```
+my_stream = db.child("posts").stream(stream_handler, stream_id="new_posts")
+```
+
 #### close the stream
 
 ```python
