@@ -408,14 +408,22 @@ class Storage:
     def delete(self, name):
         self.bucket.delete_blob(name)
 
-    def download(self, filename):
+    def download(self, filename, token=None):
         # remove leading backlash
         path = self.path
+        url = self.get_url(token)
         self.path = None
         if path.startswith('/'):
             path = path[1:]
-        blob = self.bucket.get_blob(path)
-        blob.download_to_filename(filename)
+        if self.credentials:
+            blob = self.bucket.get_blob(path)
+            blob.download_to_filename(filename)
+        else:
+            r = requests.get(url, stream=True)
+            if r.status_code == 200:
+                with open(filename, 'wb') as f:
+                    for chunk in r:
+                        f.write(chunk)
 
     def get_url(self, token):
         path = self.path
