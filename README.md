@@ -1,4 +1,4 @@
-# Pyrebase  ![downloads](https://stark-waters-86589.herokuapp.com/downloads)
+# Pyrebase
 
 A simple python wrapper for the [Firebase API](https://firebase.google.com).
 
@@ -170,8 +170,8 @@ db.child("users").push(data)
 To create your own keys use the ```set()``` method. The key in the example below is "Morty".
 
 ```python
-data = {"Morty": {"name": "Mortimer 'Morty' Smith"}}
-db.child("users").set(data)
+data = {"name": "Mortimer 'Morty' Smith"}
+db.child("users").child("Morty").set(data)
 ```
 
 #### update
