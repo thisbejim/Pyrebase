@@ -34,6 +34,7 @@ firebase = pyrebase.initialize_app(config)
 We can optionally add a [service account credential](https://firebase.google.com/docs/server/setup#prerequisites) to our
 configuration that will allow our server to authenticate with Firebase as an admin and disregard any security rules.
 
+The credential can be added by adding a path to the json file provided by Firebase to your config.
 ```python
 import pyrebase
 
@@ -46,6 +47,32 @@ config = {
 }
 
 firebase = pyrebase.initialize_app(config)
+```
+
+The contents of the file can also be assigned as a dictionary variable and referenced in the config.
+
+```python
+
+firebase_service_account = {
+  "type": "service_account",
+  "project_id": "",
+  "private_key_id": "",
+  "private_key": "-----BEGIN PRIVATE KEY-----your-firebase-cert-----END PRIVATE KEY-----\n",
+  "client_email": "",
+  "client_id": "",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://accounts.google.com/o/oauth2/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": ""  
+}
+
+config = {
+  "apiKey": "apiKey",
+  "authDomain": "projectId.firebaseapp.com",
+  "databaseURL": "https://databaseName.firebaseio.com",
+  "storageBucket": "projectId.appspot.com",
+  "serviceAccount": firebase_service_account
+}
 ```
 
 Adding a service account will authenticate as an admin by default for all database queries, check out the
