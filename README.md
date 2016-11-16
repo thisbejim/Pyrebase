@@ -49,7 +49,7 @@ config = {
 firebase = pyrebase.initialize_app(config)
 ```
 
-The contents of the file can also be assigned as a dictionary variable and referenced in the config.
+The contents of the file can also be assigned as a dictionary variable and referenced in the config. Your config file should of course be kept private and not added to the repo. Otherwise your credentials will become public.
 
 ```python
 
