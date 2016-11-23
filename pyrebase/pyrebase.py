@@ -334,11 +334,11 @@ class Database:
         time_stamp_chars = [0] * 8
         for i in reversed(range(0, 8)):
             time_stamp_chars[i] = push_chars[now % 64]
-            now = math.floor(now / 64)
+            now = int(math.floor(now / 64))
         new_id = "".join(time_stamp_chars)
         if not duplicate_time:
             for i in range(0, 12):
-                self.last_rand_chars.append(math.floor(uniform(0, 1) * 64))
+                self.last_rand_chars.append(int(math.floor(uniform(0, 1) * 64)))
         else:
             for i in range(0, 11):
                 if self.last_rand_chars[i] == 63:
