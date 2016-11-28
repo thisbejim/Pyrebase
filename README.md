@@ -273,13 +273,17 @@ Note: ```shallow()``` can not be used in conjunction with any complex queries.
 You can listen to live changes to your data with the ```stream()``` method.
 
 ```python
-def stream_handler(post):
-    print(post["event"]) # put
-    print(post["path"]) # /-K7yGTTEp7O549EzTYtI
-    print(post["data"]) # {'title': 'Pyrebase', "body": "etc..."}
+def stream_handler(message):
+    print(message["event"]) # put
+    print(message["path"]) # /-K7yGTTEp7O549EzTYtI
+    print(message["data"]) # {'title': 'Pyrebase', "body": "etc..."}
 
 my_stream = db.child("posts").stream(stream_handler)
 ```
+
+You should at least handle `put` and `patch` events. Refer to ["Streaming from the REST API"][streaming] for details.
+
+[streaming]: https://firebase.google.com/docs/reference/rest/database/#section-streaming
 
 You can also add a ```stream_id``` to help you identify a stream if you have multiple running:
 
