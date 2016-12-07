@@ -53,22 +53,6 @@ class SSEClient(object):
         # attribute on Events like the Javascript spec requires.
         self.resp.raise_for_status()
 
-        if not self.start_time:
-            self.thread = threading.Thread(target=self.connect)
-            self.thread.start()
-
-    def connect(self):
-        while self.running:
-            if self.start_time:
-                half_hour_in_seconds = 1800
-                # if it has been a half hour since we started the stream, restart
-                if time.time() - self.start_time > half_hour_in_seconds:
-                    self.start_time = time.time()
-                    self._connect()
-            else:
-                self.start_time = time.time()
-            time.sleep(0.1)
-
     def _event_complete(self):
         return re.search(end_of_field, self.buf) is not None
 
@@ -96,6 +80,13 @@ class SSEClient(object):
 
         self.buf = tail
         msg = Event.parse(head)
+
+        if msg.data == "credential is no longer valid":
+            self._connect()
+            return None
+
+        if msg.data == 'null':
+            return None
 
         # If the server requests a specific retry delay, we need to honor it.
         if msg.retry:
