@@ -249,7 +249,8 @@ class Database:
     def build_headers(self, token=None):
         headers = {"content-type": "application/json; charset=UTF-8"}
         if not token and self.credentials:
-            headers['Authorization'] = 'Bearer ' + self.credentials.get_access_token().access_token
+            access_token = self.credentials.get_access_token().access_token
+            headers['Authorization'] = 'Bearer ' + access_token
         return headers
 
     def get(self, token=None):
@@ -443,6 +444,7 @@ def raise_detailed_error(request_object):
         request_object.raise_for_status()
     except HTTPError as e:
         # raise detailed error message
+        # TODO: Check if we get a { "error" : "Permission denied." } and handle automatically
         raise HTTPError(e, request_object.text)
 
 
@@ -553,9 +555,8 @@ class Stream:
     def start_stream(self):
         self.sse = ClosableSSEClient(self.url, session=self.make_session(), build_headers=self.build_headers)
         for msg in self.sse:
-            msg_data = json.loads(msg.data)
-            # don't return initial data
-            if msg_data:
+            if msg:
+                msg_data = json.loads(msg.data)
                 msg_data["event"] = msg.event
                 if self.stream_id:
                     msg_data["stream_id"] = self.stream_id
