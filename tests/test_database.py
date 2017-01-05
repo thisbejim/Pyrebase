@@ -1,3 +1,4 @@
+import datetime
 import random
 import time
 from contextlib import contextmanager
@@ -57,6 +58,36 @@ class TestSimpleGetAndPut:
 
         # gives: assert [None, {'11': {'111': 42}}] == {'1': {'11': {'111': 42}}}
         assert db_sa().get().val() == v
+
+
+class TestJsonKwargs:
+
+    def encoder(self, obj):
+        if isinstance(obj, datetime.datetime):
+            return {
+                '__type__': obj.__class__.__name__,
+                'value': obj.timestamp(),
+            }
+        return obj
+
+    def decoder(self, obj):
+        if '__type__' in obj and obj['__type__'] == datetime.datetime.__name__:
+            return datetime.datetime.utcfromtimestamp(obj['value'])
+        return obj
+
+    def test_put_fail(self, db_sa):
+        v = {'some_datetime': datetime.datetime.now()}
+        with pytest.raises(TypeError):
+            db_sa().set(v)
+
+    def test_put_succeed(self, db_sa):
+        v = {'some_datetime': datetime.datetime.now()}
+        assert db_sa().set(v, json_kwargs={'default': str})
+
+    def test_put_then_get_succeed(self, db_sa):
+        v = {'another_datetime': datetime.datetime.now()}
+        db_sa().set(v, json_kwargs={'default': self.encoder})
+        assert db_sa().get(json_kwargs={'object_hook': self.decoder}).val() == v
 
 
 class TestChildNavigation:
