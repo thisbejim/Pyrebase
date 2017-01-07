@@ -567,6 +567,5 @@ class Stream:
             time.sleep(0.001)
         self.sse.running = False
         self.sse.close()
-        self.sse.thread.join()
         self.thread.join()
         return self
