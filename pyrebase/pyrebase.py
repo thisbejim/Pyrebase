@@ -253,7 +253,7 @@ class Database:
             headers['Authorization'] = 'Bearer ' + access_token
         return headers
 
-    def get(self, token=None):
+    def get(self, token=None, json_kwargs={}):
         build_query = self.build_query
         query_key = self.path.split("/")[-1]
         request_ref = self.build_request_url(token)
@@ -262,7 +262,7 @@ class Database:
         # do request
         request_object = self.requests.get(request_ref, headers=headers)
         raise_detailed_error(request_object)
-        request_dict = request_object.json()
+        request_dict = request_object.json(**json_kwargs)
 
         # if primitive or simple query return
         if isinstance(request_dict, list):
@@ -285,27 +285,27 @@ class Database:
                 sorted_response = sorted(request_dict.items(), key=lambda item: item[1][build_query["orderBy"]])
         return PyreResponse(convert_to_pyre(sorted_response), query_key)
 
-    def push(self, data, token=None):
+    def push(self, data, token=None, json_kwargs={}):
         request_ref = self.check_token(self.database_url, self.path, token)
         self.path = ""
         headers = self.build_headers(token)
-        request_object = self.requests.post(request_ref, headers=headers, data=json.dumps(data).encode("utf-8"))
+        request_object = self.requests.post(request_ref, headers=headers, data=json.dumps(data, **json_kwargs).encode("utf-8"))
         raise_detailed_error(request_object)
         return request_object.json()
 
-    def set(self, data, token=None):
+    def set(self, data, token=None, json_kwargs={}):
         request_ref = self.check_token(self.database_url, self.path, token)
         self.path = ""
         headers = self.build_headers(token)
-        request_object = self.requests.put(request_ref, headers=headers, data=json.dumps(data).encode("utf-8"))
+        request_object = self.requests.put(request_ref, headers=headers, data=json.dumps(data, **json_kwargs).encode("utf-8"))
         raise_detailed_error(request_object)
         return request_object.json()
 
-    def update(self, data, token=None):
+    def update(self, data, token=None, json_kwargs={}):
         request_ref = self.check_token(self.database_url, self.path, token)
         self.path = ""
         headers = self.build_headers(token)
-        request_object = self.requests.patch(request_ref, headers=headers, data=json.dumps(data).encode("utf-8"))
+        request_object = self.requests.patch(request_ref, headers=headers, data=json.dumps(data, **json_kwargs).encode("utf-8"))
         raise_detailed_error(request_object)
         return request_object.json()
 
