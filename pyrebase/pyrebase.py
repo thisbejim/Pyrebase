@@ -1,6 +1,6 @@
 import requests
 from requests import Session
-from requests.exceptions import HTTPError
+from requests.exceptions import HTTPError, ConnectTimeout
 
 try:
     from urllib.parse import urlencode, quote
@@ -183,6 +183,8 @@ class Database:
         self.last_push_time = 0
         self.last_rand_chars = []
 
+        self.requests_parameters = {}
+
     def order_by_key(self):
         self.build_query["orderBy"] = "$key"
         return self
@@ -253,14 +255,31 @@ class Database:
             headers['Authorization'] = 'Bearer ' + access_token
         return headers
 
-    def get(self, token=None, json_kwargs={}):
+    def set_timeout(self, timeout):
+        # see requests Timeouts.
+        # timeout disable with set timeout=None
+        self.requests_parameters["timeout"] = timeout
+        return self
+
+    def _requests(self, method, request_ref, timeout, **kwargs):
+        if method not in ["get", "post", "put", "patch", "delete"]:
+            # TODO: raise some exception
+            return None
+        requests_parameters = self.requests_parameters.copy()
+        requests_parameters.update(kwargs)
+        if timeout != 0:
+            requests_parameters["timeout"] = timeout
+        return getattr(self.requests, method)(request_ref, **requests_parameters)
+
+    def get(self, token=None, json_kwargs={}, timeout=0):
         build_query = self.build_query
         query_key = self.path.split("/")[-1]
         request_ref = self.build_request_url(token)
         # headers
         headers = self.build_headers(token)
         # do request
-        request_object = self.requests.get(request_ref, headers=headers)
+        kwargs = {"headers": headers, "timeout": timeout}
+        request_object = self._requests("get", request_ref, **kwargs)
         raise_detailed_error(request_object)
         request_dict = request_object.json(**json_kwargs)
 
@@ -285,35 +304,39 @@ class Database:
                 sorted_response = sorted(request_dict.items(), key=lambda item: item[1][build_query["orderBy"]])
         return PyreResponse(convert_to_pyre(sorted_response), query_key)
 
-    def push(self, data, token=None, json_kwargs={}):
+    def push(self, data, token=None, json_kwargs={}, timeout=0):
         request_ref = self.check_token(self.database_url, self.path, token)
         self.path = ""
         headers = self.build_headers(token)
-        request_object = self.requests.post(request_ref, headers=headers, data=json.dumps(data, **json_kwargs).encode("utf-8"))
+        kwargs = {"headers": headers, "timeout": timeout, "data": json.dumps(data, **json_kwargs).encode("utf-8")}
+        request_object = self._requests("post", request_ref, **kwargs)
         raise_detailed_error(request_object)
         return request_object.json()
 
-    def set(self, data, token=None, json_kwargs={}):
+    def set(self, data, token=None, json_kwargs={}, timeout=0):
         request_ref = self.check_token(self.database_url, self.path, token)
         self.path = ""
         headers = self.build_headers(token)
-        request_object = self.requests.put(request_ref, headers=headers, data=json.dumps(data, **json_kwargs).encode("utf-8"))
+        kwargs = {"headers": headers, "timeout": timeout, "data": json.dumps(data, **json_kwargs).encode("utf-8")}
+        request_object = self._requests("put", request_ref, **kwargs)
         raise_detailed_error(request_object)
         return request_object.json()
 
-    def update(self, data, token=None, json_kwargs={}):
+    def update(self, data, token=None, json_kwargs={}, timeout=0):
         request_ref = self.check_token(self.database_url, self.path, token)
         self.path = ""
         headers = self.build_headers(token)
-        request_object = self.requests.patch(request_ref, headers=headers, data=json.dumps(data, **json_kwargs).encode("utf-8"))
+        kwargs = {"headers": headers, "timeout": timeout, "data": json.dumps(data, **json_kwargs).encode("utf-8")}
+        request_object = self._requests("patch", request_ref, **kwargs)
         raise_detailed_error(request_object)
         return request_object.json()
 
-    def remove(self, token=None):
+    def remove(self, token=None, timeout=0):
         request_ref = self.check_token(self.database_url, self.path, token)
         self.path = ""
         headers = self.build_headers(token)
-        request_object = self.requests.delete(request_ref, headers=headers)
+        kwargs = {"headers": headers, "timeout": timeout}
+        request_object = self._requests("delete", request_ref, **kwargs)
         raise_detailed_error(request_object)
         return request_object.json()
 
@@ -446,7 +469,8 @@ def raise_detailed_error(request_object):
         # raise detailed error message
         # TODO: Check if we get a { "error" : "Permission denied." } and handle automatically
         raise HTTPError(e, request_object.text)
-
+    except ConnectTimeout as e:
+        raise ConnectTimeout(e, request_object.text)
 
 def convert_to_pyre(items):
     pyre_list = []
