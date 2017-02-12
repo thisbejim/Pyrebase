@@ -268,6 +268,25 @@ all_user_ids = db.child("users").shallow().get()
 
 Note: ```shallow()``` can not be used in conjunction with any complex queries.
 
+#### set_timeout
+
+To set the requests(get, set, push, remove) timeout use the ```set_timeout()``` method.
+
+You can set timeout, more than 0 value of float.
+
+See [Quickstart, Requests, Timeouts](http://docs.python-requests.org/en/master/user/quickstart/#timeouts).
+
+```python
+# set timeouts to instance
+db.set_timeout(timeout=0.001)
+# will raise requests.exceptions.ConnectTimeout.
+db.get("users")
+# Arg:timeout overwrites set_timeout() value, will success.
+db.get("users", timeout=60)
+# set timeout=None, Timeout is not set(default).
+db.set_timeout(None)
+```
+
 #### streaming
 
 You can listen to live changes to your data with the ```stream()``` method.
