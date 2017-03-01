@@ -2,6 +2,7 @@ import datetime
 import random
 import time
 from contextlib import contextmanager
+from collections import OrderedDict
 
 import pytest
 
@@ -15,8 +16,8 @@ def db_sa(db):
 
 
 @contextmanager
-def make_stream(db, cbk):
-    s = db.stream(cbk)
+def make_stream(db, cbk, json_kwargs=None):
+    s = db.stream(cbk, json_kwargs=json_kwargs)
     try:
         yield s
     finally:
@@ -24,13 +25,13 @@ def make_stream(db, cbk):
 
 
 @contextmanager
-def make_append_stream(db):
+def make_append_stream(db, json_kwargs=None):
     l = []
 
     def cbk(event):
         l.append(event)
 
-    with make_stream(db, cbk) as s:
+    with make_stream(db, cbk, json_kwargs) as s:
         yield s, l
 
 
@@ -134,3 +135,17 @@ class TestStreaming:
             time.sleep(2)
 
             assert len(l) == 3
+
+    def test_returns_dict(self, db_sa):
+        with make_append_stream(db_sa()) as (stream, l):
+            db_sa().set({"e1": "a", "e2": "b", "e3": "c", "e4": "d"})
+            time.sleep(2)
+            assert isinstance(l[0]['data'], dict)
+            assert not isinstance(l[0]['data'], OrderedDict)
+
+    def test_returns_ordered_dict(self, db_sa):
+        with make_append_stream(db_sa(), json_kwargs={"object_pairs_hook": OrderedDict}) as (stream, l):
+            db_sa().set({"e1": "a", "e2": "b", "e3": "c", "e4": "d"})
+            time.sleep(2)
+            assert isinstance(l[0]['data'], dict)
+            assert isinstance(l[0]['data'], OrderedDict)

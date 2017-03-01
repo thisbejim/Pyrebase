@@ -317,9 +317,9 @@ class Database:
         raise_detailed_error(request_object)
         return request_object.json()
 
-    def stream(self, stream_handler, token=None, stream_id=None):
+    def stream(self, stream_handler, token=None, stream_id=None, json_kwargs=None):
         request_ref = self.build_request_url(token)
-        return Stream(request_ref, stream_handler, self.build_headers, stream_id)
+        return Stream(request_ref, stream_handler, self.build_headers, stream_id, json_kwargs)
 
     def check_token(self, database_url, path, token):
         if token:
@@ -531,13 +531,14 @@ class ClosableSSEClient(SSEClient):
 
 
 class Stream:
-    def __init__(self, url, stream_handler, build_headers, stream_id):
+    def __init__(self, url, stream_handler, build_headers, stream_id, json_kwargs):
         self.build_headers = build_headers
         self.url = url
         self.stream_handler = stream_handler
         self.stream_id = stream_id
         self.sse = None
         self.thread = None
+        self.json_kwargs = json_kwargs if json_kwargs else {}
         self.start()
 
     def make_session(self):
@@ -556,7 +557,7 @@ class Stream:
         self.sse = ClosableSSEClient(self.url, session=self.make_session(), build_headers=self.build_headers)
         for msg in self.sse:
             if msg:
-                msg_data = json.loads(msg.data)
+                msg_data = json.loads(msg.data, **self.json_kwargs)
                 msg_data["event"] = msg.event
                 if self.stream_id:
                     msg_data["stream_id"] = self.stream_id
