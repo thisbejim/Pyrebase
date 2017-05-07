@@ -183,51 +183,73 @@ class Database:
         self.last_push_time = 0
         self.last_rand_chars = []
 
+    def copy(self):
+        db = Database(
+            credentials=self.credentials,
+            api_key=self.api_key,
+            database_url=self.database_url,
+            requests=self.requests)
+        db.path = self.path
+        db.build_query = self.build_query.copy()
+        db.last_rand_chars = list(self.last_rand_chars)
+        db.last_push_time = self.last_push_time
+        return db
+
     def order_by_key(self):
-        self.build_query["orderBy"] = "$key"
-        return self
+        db = self.copy()
+        db.build_query["orderBy"] = "$key"
+        return db
 
     def order_by_value(self):
-        self.build_query["orderBy"] = "$value"
-        return self
+        db = self.copy()
+        db.build_query["orderBy"] = "$value"
+        return db
 
     def order_by_child(self, order):
-        self.build_query["orderBy"] = order
-        return self
+        db = self.copy()
+        db.build_query["orderBy"] = order
+        return db
 
     def start_at(self, start):
-        self.build_query["startAt"] = start
-        return self
+        db = self.copy()
+        db.build_query["startAt"] = start
+        return db
 
     def end_at(self, end):
-        self.build_query["endAt"] = end
-        return self
+        db = self.copy()
+        db.build_query["endAt"] = end
+        return db
 
     def equal_to(self, equal):
-        self.build_query["equalTo"] = equal
-        return self
+        db = self.copy()
+        db.build_query["equalTo"] = equal
+        return db
 
     def limit_to_first(self, limit_first):
-        self.build_query["limitToFirst"] = limit_first
-        return self
+        db = self.copy()
+        db.build_query["limitToFirst"] = limit_first
+        return db
 
     def limit_to_last(self, limit_last):
-        self.build_query["limitToLast"] = limit_last
-        return self
+        db = self.copy()
+        db.build_query["limitToLast"] = limit_last
+        return db
 
     def shallow(self):
-        self.build_query["shallow"] = True
-        return self
+        db = self.copy()
+        db.build_query["shallow"] = True
+        return db
 
     def child(self, *args):
+        db = self.copy()
         new_path = "/".join([str(arg) for arg in args])
-        if self.path:
-            self.path += "/{}".format(new_path)
+        if db.path:
+            db.path += "/{}".format(new_path)
         else:
             if new_path.startswith("/"):
                 new_path = new_path[1:]
-            self.path = new_path
-        return self
+            db.path = new_path
+        return db
 
     def build_request_url(self, token):
         parameters = {}
@@ -287,7 +309,6 @@ class Database:
 
     def push(self, data, token=None, json_kwargs={}):
         request_ref = self.check_token(self.database_url, self.path, token)
-        self.path = ""
         headers = self.build_headers(token)
         request_object = self.requests.post(request_ref, headers=headers, data=json.dumps(data, **json_kwargs).encode("utf-8"))
         raise_detailed_error(request_object)
@@ -295,7 +316,6 @@ class Database:
 
     def set(self, data, token=None, json_kwargs={}):
         request_ref = self.check_token(self.database_url, self.path, token)
-        self.path = ""
         headers = self.build_headers(token)
         request_object = self.requests.put(request_ref, headers=headers, data=json.dumps(data, **json_kwargs).encode("utf-8"))
         raise_detailed_error(request_object)
@@ -303,7 +323,6 @@ class Database:
 
     def update(self, data, token=None, json_kwargs={}):
         request_ref = self.check_token(self.database_url, self.path, token)
-        self.path = ""
         headers = self.build_headers(token)
         request_object = self.requests.patch(request_ref, headers=headers, data=json.dumps(data, **json_kwargs).encode("utf-8"))
         raise_detailed_error(request_object)
@@ -311,7 +330,6 @@ class Database:
 
     def remove(self, token=None):
         request_ref = self.check_token(self.database_url, self.path, token)
-        self.path = ""
         headers = self.build_headers(token)
         request_object = self.requests.delete(request_ref, headers=headers)
         raise_detailed_error(request_object)
