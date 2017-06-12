@@ -338,7 +338,7 @@ class Database:
             now = int(math.floor(now / 64))
         new_id = "".join(time_stamp_chars)
         if not duplicate_time:
-            self.last_rand_chars = [randrange(63) for _ in range(12)]
+            self.last_rand_chars = [randrange(64) for _ in range(12)]
         else:
             for i in range(0, 11):
                 if self.last_rand_chars[i] == 63:
