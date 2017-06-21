@@ -14,7 +14,13 @@ from collections import OrderedDict
 from sseclient import SSEClient
 import threading
 import socket
-from oauth2client.service_account import ServiceAccountCredentials
+
+try:
+    from oauth2client.service_account import ServiceAccountCredentials
+except ImportError:
+    class ServiceAccountCredentials:
+        pass
+
 from gcloud import storage
 from requests.packages.urllib3.contrib.appengine import is_appengine_sandbox
 from requests_toolbelt.adapters import appengine
