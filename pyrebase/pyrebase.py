@@ -406,8 +406,17 @@ class Storage:
             raise_detailed_error(request_object)
             return request_object.json()
 
-    def delete(self, name):
-        self.bucket.delete_blob(name)
+    def delete(self, name, token=None):
+        if self.credentials:
+            self.bucket.delete_blob(name)
+        else:
+            request_ref = self.storage_bucket + "/o?name={0}".format(name)
+            if token:
+                headers = {"Authorization": "Firebase " + token}
+                request_object = self.requests.delete(request_ref, headers=headers)
+            else:
+                request_object = self.requests.delete(request_ref)
+            raise_detailed_error(request_object)
 
     def download(self, filename, token=None):
         # remove leading backlash
