@@ -86,7 +86,7 @@ class Auth:
         self.current_user = request_object.json()
         return request_object.json()
 
-    def create_custom_token(self, uid, additional_claims=None):
+    def create_custom_token(self, uid, additional_claims=None, expiry_minutes=60):
         service_account_email = self.credentials.service_account_email
         private_key = RSA.importKey(self.credentials._private_key_pkcs8_pem)
         payload = {
@@ -95,9 +95,10 @@ class Auth:
             "aud": "https://identitytoolkit.googleapis.com/google.identity.identitytoolkit.v1.IdentityToolkit",
             "uid": uid
         }
+    
         if additional_claims:
             payload["claims"] = additional_claims
-        exp = datetime.timedelta(minutes=60)
+        exp = datetime.timedelta(minutes=expiry_minutes)
         return jwt.generate_jwt(payload, private_key, "RS256", exp)
 
     def sign_in_with_custom_token(self, token):
