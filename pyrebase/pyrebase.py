@@ -349,14 +349,14 @@ class Database:
             new_id += push_chars[self.last_rand_chars[i]]
         return new_id
 
-    def sort(self, origin, by_key):
+    def sort(self, origin, by_key, reverse=False):
         # unpack pyre objects
         pyres = origin.each()
         new_list = []
         for pyre in pyres:
             new_list.append(pyre.item)
         # sort
-        data = sorted(dict(new_list).items(), key=lambda item: item[1][by_key])
+        data = sorted(dict(new_list).items(), key=lambda item: item[1][by_key], reverse=reverse)
         return PyreResponse(convert_to_pyre(data), origin.key())
 
 
