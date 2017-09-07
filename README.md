@@ -145,6 +145,11 @@ auth.get_account_info(user['idToken'])
 user = auth.refresh(user['refreshToken'])
 ```
 
+#### Delete account
+```python
+auth.delete_user_account(user['idToken'])
+```
+
 ## Database
 
 You can build paths to your data by using the ```child()``` method.

@@ -163,6 +163,14 @@ class Auth:
         raise_detailed_error(request_object)
         return request_object.json()
 
+    def delete_user_account(self, id_token):
+        request_ref = "https://www.googleapis.com/identitytoolkit/v3/relyingparty/deleteAccount?key={0}".format(self.api_key)
+        headers = {"content-type": "application/json; charset=UTF-8"}
+        data = json.dumps({"idToken": id_token})
+        request_object = requests.post(request_ref, headers=headers, data=data)
+        raise_detailed_error(request_object)
+        return request_object.json()
+
 
 class Database:
     """ Database Service """
