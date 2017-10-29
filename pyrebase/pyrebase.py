@@ -419,6 +419,13 @@ class Storage:
         if self.credentials:
             blob = self.bucket.get_blob(path)
             blob.download_to_filename(filename)
+        elif token:
+            headers = {"Authorization": "Firebase " + token}
+            r = requests.get(url, stream=True, headers=headers)
+            if r.status_code == 200:
+                with open(filename, 'wb') as f:
+                    for chunk in r:
+                        f.write(chunk)
         else:
             r = requests.get(url, stream=True)
             if r.status_code == 200:
