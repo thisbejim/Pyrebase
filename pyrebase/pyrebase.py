@@ -86,6 +86,15 @@ class Auth:
         self.current_user = request_object.json()
         return request_object.json()
 
+    def sign_in_anonymous(self):
+        request_ref = "https://www.googleapis.com/identitytoolkit/v3/relyingparty/signupNewUser?key={0}".format(self.apiKey)
+        headers = {"content-type": "application/json; charset=UTF-8" }
+        data = json.dumps({"returnSecureToken": True})
+        request_object = requests.post(request_ref, headers=headers, data=data)
+        raise_detailed_error(request_object)
+        self.current_user = request_object.json()
+        return request_object.json()
+
     def create_custom_token(self, uid, additional_claims=None):
         service_account_email = self.credentials.service_account_email
         private_key = RSA.importKey(self.credentials._private_key_pkcs8_pem)
@@ -162,7 +171,6 @@ class Auth:
         request_object = requests.post(request_ref, headers=headers, data=data)
         raise_detailed_error(request_object)
         return request_object.json()
-
 
 class Database:
     """ Database Service """
