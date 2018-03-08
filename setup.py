@@ -1,11 +1,11 @@
 from setuptools import setup, find_packages
 
 setup(
-    name='Pyrebase',
-    version='3.0.27',
-    url='https://github.com/thisbejim/Pyrebase',
-    description='A simple python wrapper for the Firebase API',
-    author='James Childs-Maidment',
+    name='Pyrebase3',
+    version='4.0.0',
+    url='https://github.com/acevdog/Pyrebase',
+    description='A maintained simple python wrapper for the Firebase API',
+    author='acevedog',
     license='MIT',
     classifiers=[
         'Development Status :: 3 - Alpha',

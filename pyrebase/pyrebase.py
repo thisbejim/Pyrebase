@@ -375,7 +375,7 @@ class Database:
         data = sorted(dict(new_list).items(), key=lambda item: item[1][by_key], reverse=reverse)
         return PyreResponse(convert_to_pyre(data), origin.key())
 
-     def get_etag(self, token=None, json_kwargs={}):
+    def get_etag(self, token=None, json_kwargs={}):
          request_ref = self.build_request_url(token)
          headers = self.build_headers(token)
          # extra header to get ETag
