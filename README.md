@@ -144,6 +144,10 @@ auth.get_account_info(user['idToken'])
 ```python
 user = auth.refresh(user['refreshToken'])
 ```
+#### Delete account
+```python
+auth.delete_user_account(user['idToken'])
+```
 
 ## Database
 
