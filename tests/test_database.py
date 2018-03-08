@@ -134,3 +134,28 @@ class TestStreaming:
             time.sleep(2)
 
             assert len(l) == 3
+
+class TestConditionalRequest:
+     def test_conditional_set_succeed(self, db_sa):
+         etag = db_sa().get_etag()
+         result = db_sa().conditional_set({'1': 'a'}, etag)
+
+         assert db_sa().child('1').get().val() == 'a'
+
+     def test_conditional_set_fail(self, db_sa):
+         etag = '{}123'.format(db_sa().get_etag())
+         result = db_sa().conditional_set({'2': 'b'}, etag)
+
+         assert 'ETag' in result
+
+     def test_conditional_remove_succeed(self, db_sa):
+         etag = db_sa().child('1').get_etag()
+         result = db_sa().child('1').conditional_remove(etag)
+
+         assert db_sa().child('1').get().val() is None
+
+     def test_conditional_remove_fail(self, db_sa):
+         etag = '{}123'.format(db_sa().get_etag())
+         result = db_sa().conditional_remove(etag)
+
+         assert 'ETag' in result

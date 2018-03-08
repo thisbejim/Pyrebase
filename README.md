@@ -258,6 +258,37 @@ To return data from a path simply call the ```get()``` method.
 all_users = db.child("users").get()
 ```
 
+#### Conditional Requests
+
+It's possible to do conditional sets and removes by using the `conditional_set()` and `conitional_remove()` methods respectively. You can read more about conditional requests in Firebase [here](https://firebase.google.com/docs/reference/rest/database/#section-conditional-requests).
+
+To use these methods, you first get the ETag of a particular path by using the `get_etag()` method. You can then use that tag in your conditional request.
+
+```python
+etag = db.child("users").child("Morty").get_etag()
+data = {"name": "Mortimer 'Morty' Smith"}
+db.child("users").child("Morty").conditional_set(data, etag)
+```
+
+If the passed ETag does not match the ETag of the path in the database, the data will not be written, and both conditional request methods will return a single key-value pair with the new ETag to use of the following form:
+
+```json
+{ "ETag": "8KnE63B6HiKp67Wf3HQrXanujSM=" }
+```
+
+Here's an example of checking whether or not a conditional removal was successful:
+
+```python
+etag = db.child("users").child("Morty").get_etag()
+response = db.child("users").child("Morty").conditional_remove(etag)
+
+if "ETag" in response:
+    etag = response["ETag"] # our ETag was out-of-date
+else:
+    print("We removed the data successfully!")
+```
+
+
 #### shallow
 
 To return just the keys at a particular path use the ```shallow()``` method.
