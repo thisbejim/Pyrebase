@@ -8,7 +8,7 @@ except:
     from urllib import urlencode, quote
 import json
 import math
-from random import uniform
+from random import randrange
 import time
 from collections import OrderedDict
 from sseclient import SSEClient
@@ -355,8 +355,7 @@ class Database:
             now = int(math.floor(now / 64))
         new_id = "".join(time_stamp_chars)
         if not duplicate_time:
-            for i in range(0, 12):
-                self.last_rand_chars.append(int(math.floor(uniform(0, 1) * 64)))
+            self.last_rand_chars = [randrange(64) for _ in range(12)]
         else:
             for i in range(0, 11):
                 if self.last_rand_chars[i] == 63:
