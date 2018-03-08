@@ -426,7 +426,8 @@ class Storage:
             path = path[1:]
         if self.credentials:
             blob = self.bucket.get_blob(path)
-            blob.download_to_filename(filename)
+            if not blob is None:
+                blob.download_to_filename(filename)
         else:
             r = requests.get(url, stream=True)
             if r.status_code == 200:
