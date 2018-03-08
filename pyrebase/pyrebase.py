@@ -398,7 +398,7 @@ class Database:
          raise_detailed_error(request_object)
          return request_object.json()
 
-     def conditional_remove(self, etag, token=None):
+    def conditional_remove(self, etag, token=None):
          request_ref = self.check_token(self.database_url, self.path, token)
          self.path = ""
          headers = self.build_headers(token)
