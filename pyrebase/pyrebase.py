@@ -529,6 +529,9 @@ class PyreResponse:
         self.pyres = pyres
         self.query_key = query_key
 
+    def __getitem__(self,index):
+       return self.pyres[index]
+
     def val(self):
         if isinstance(self.pyres, list):
             # unpack pyres into OrderedDict
