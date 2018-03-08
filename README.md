@@ -424,4 +424,4 @@ articles_by_likes = db.sort(articles, "likes")
 
 #### Index not defined
 
-Indexing is [not enabled](https://www.firebase.com/docs/security/guide/indexing-data.html) for the database reference.
++Indexing is [not enabled](https://firebase.google.com/docs/database/security/indexing-data) for the database reference.
