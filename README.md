@@ -76,6 +76,9 @@ auth = firebase.auth()
 # Log the user in
 user = auth.sign_in_with_email_and_password(email, password)
 
+# Log the user in anonymously
+user = auth.sign_in_anonymous()
+
 # Get a reference to the database service
 db = firebase.database()
 

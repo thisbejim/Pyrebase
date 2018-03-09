@@ -87,7 +87,7 @@ class Auth:
         return request_object.json()
 
     def sign_in_anonymous(self):
-        request_ref = "https://www.googleapis.com/identitytoolkit/v3/relyingparty/signupNewUser?key={0}".format(self.apiKey)
+        request_ref = "https://www.googleapis.com/identitytoolkit/v3/relyingparty/signupNewUser?key={0}".format(self.api_key)
         headers = {"content-type": "application/json; charset=UTF-8" }
         data = json.dumps({"returnSecureToken": True})
         request_object = requests.post(request_ref, headers=headers, data=data)
