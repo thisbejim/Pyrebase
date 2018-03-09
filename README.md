@@ -35,7 +35,7 @@ We can optionally add a [service account credential](https://firebase.google.com
 configuration that will allow our server to authenticate with Firebase as an admin and disregard any security rules.
 
 ```python
-import pyrebase
+import pyrebase3
 
 config = {
   "apiKey": "apiKey",
