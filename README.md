@@ -19,7 +19,7 @@ Pyrebase was written for python 3 and will not work correctly with python 2.
 For use with only user based authentication we can create the following configuration:
 
 ```python
-import pyrebase3
+import pyrebase
 
 config = {
   "apiKey": "apiKey",
@@ -35,7 +35,7 @@ We can optionally add a [service account credential](https://firebase.google.com
 configuration that will allow our server to authenticate with Firebase as an admin and disregard any security rules.
 
 ```python
-import pyrebase3
+import pyrebase
 
 config = {
   "apiKey": "apiKey",
