@@ -19,7 +19,7 @@ Pyrebase was written for python 3 and will not work correctly with python 2.
 For use with only user based authentication we can create the following configuration:
 
 ```python
-import pyrebase
+import pyrebase3
 
 config = {
   "apiKey": "apiKey",
