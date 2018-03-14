@@ -462,11 +462,9 @@ class Storage:
     def delete(self, name):
         self.bucket.delete_blob(name)
 
-    def download(self, filename, token=None):
+    def download(self, path, filename, token=None):
         # remove leading backlash
-        path = self.path
         url = self.get_url(token)
-        self.path = None
         if path.startswith('/'):
             path = path[1:]
         if self.credentials:
