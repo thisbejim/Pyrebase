@@ -1,27 +1,27 @@
+from collections import OrderedDict
+import datetime
+import json
+import math
+from random import uniform
+import socket
+import threading
+import time
+
+from gcloud import storage
+from google.auth import jwt
+from google.auth.transport.requests import AuthorizedSession
+from google.oauth2 import service_account
 import requests
-from requests import Session
 from requests.exceptions import HTTPError
+from requests.packages.urllib3.contrib.appengine import is_appengine_sandbox
+from requests_toolbelt.adapters import appengine
+
+from sseclient import SSEClient
 
 try:
     from urllib.parse import urlencode, quote
 except:
     from urllib import urlencode, quote
-import json
-import math
-from random import uniform
-import time
-from collections import OrderedDict
-from sseclient import SSEClient
-import threading
-import socket
-from oauth2client.service_account import ServiceAccountCredentials
-from gcloud import storage
-from requests.packages.urllib3.contrib.appengine import is_appengine_sandbox
-from requests_toolbelt.adapters import appengine
-
-import python_jwt as jwt
-from Crypto.PublicKey import RSA
-import datetime
 
 
 def initialize_app(config):
@@ -36,7 +36,7 @@ class Firebase:
         self.database_url = config["databaseURL"]
         self.storage_bucket = config["storageBucket"]
         self.credentials = None
-        self.requests = requests.Session()
+
         if config.get("serviceAccount"):
             scopes = [
                 'https://www.googleapis.com/auth/firebase.database',
@@ -45,9 +45,19 @@ class Firebase:
             ]
             service_account_type = type(config["serviceAccount"])
             if service_account_type is str:
-                self.credentials = ServiceAccountCredentials.from_json_keyfile_name(config["serviceAccount"], scopes)
+                self.credentials = service_account.Credentials.from_service_account_file(
+                    config["serviceAccount"],
+                    scopes=scopes
+                )
             if service_account_type is dict:
-                self.credentials = ServiceAccountCredentials.from_json_keyfile_dict(config["serviceAccount"], scopes)
+                self.credentials = service_account.Credentials.from_service_account_info(
+                    config["serviceAccount"],
+                    scopes=scopes
+                )
+            self.requests = AuthorizedSession(self.credentials)
+        else:
+            self.requests = requests.Session()
+
         if is_appengine_sandbox():
             # Fix error in standard GAE environment
             # is releated to https://github.com/kennethreitz/requests/issues/3187
@@ -87,18 +97,19 @@ class Auth:
         return request_object.json()
 
     def create_custom_token(self, uid, additional_claims=None):
-        service_account_email = self.credentials.service_account_email
-        private_key = RSA.importKey(self.credentials._private_key_pkcs8_pem)
-        payload = {
-            "iss": service_account_email,
-            "sub": service_account_email,
-            "aud": "https://identitytoolkit.googleapis.com/google.identity.identitytoolkit.v1.IdentityToolkit",
-            "uid": uid
+        audience = "https://identitytoolkit.googleapis.com/google.identity.identitytoolkit.v1.IdentityToolkit"
+        claims = {
+            "uid": uid,
         }
         if additional_claims:
-            payload["claims"] = additional_claims
-        exp = datetime.timedelta(minutes=60)
-        return jwt.generate_jwt(payload, private_key, "RS256", exp)
+            claims.update(additional_claims)
+        credentials = jwt.Credentials.from_signing_credentials(
+            self.credentials,
+            audience=audience,
+            additional_claims=claims
+        )
+        credentials.refresh(None)
+        return credentials.token.decode()
 
     def sign_in_with_custom_token(self, token):
         request_ref = "https://www.googleapis.com/identitytoolkit/v3/relyingparty/verifyCustomToken?key={0}".format(self.api_key)
@@ -248,9 +259,6 @@ class Database:
 
     def build_headers(self, token=None):
         headers = {"content-type": "application/json; charset=UTF-8"}
-        if not token and self.credentials:
-            access_token = self.credentials.get_access_token().access_token
-            headers['Authorization'] = 'Bearer ' + access_token
         return headers
 
     def get(self, token=None, json_kwargs={}):
@@ -319,7 +327,7 @@ class Database:
 
     def stream(self, stream_handler, token=None, stream_id=None):
         request_ref = self.build_request_url(token)
-        return Stream(request_ref, stream_handler, self.build_headers, stream_id)
+        return Stream(request_ref, stream_handler, self.build_headers, stream_id, session=self.requests)
 
     def check_token(self, database_url, path, token):
         if token:
@@ -503,7 +511,7 @@ class Pyre:
         return self.item[0]
 
 
-class KeepAuthSession(Session):
+class KeepAuthSession(requests.Session):
     """
     A session that doesn't drop Authentication on redirects between domains.
     """
@@ -531,20 +539,21 @@ class ClosableSSEClient(SSEClient):
 
 
 class Stream:
-    def __init__(self, url, stream_handler, build_headers, stream_id):
+    def __init__(self, url, stream_handler, build_headers, stream_id, session=None):
         self.build_headers = build_headers
         self.url = url
         self.stream_handler = stream_handler
         self.stream_id = stream_id
         self.sse = None
         self.thread = None
+        self.session = session
         self.start()
 
     def make_session(self):
         """
         Return a custom session object to be passed to the ClosableSSEClient.
         """
-        session = KeepAuthSession()
+        session = KeepAuthSession() if self.session is None else self.session
         return session
 
     def start(self):
