@@ -1,5 +1,4 @@
 from collections import OrderedDict
-import datetime
 import json
 import math
 from random import uniform
@@ -20,7 +19,7 @@ from sseclient import SSEClient
 
 try:
     from urllib.parse import urlencode, quote
-except:
+except ImportError:
     from urllib import urlencode, quote
 
 
@@ -168,7 +167,7 @@ class Auth:
 
     def create_user_with_email_and_password(self, email, password):
         request_ref = "https://www.googleapis.com/identitytoolkit/v3/relyingparty/signupNewUser?key={0}".format(self.api_key)
-        headers = {"content-type": "application/json; charset=UTF-8" }
+        headers = {"content-type": "application/json; charset=UTF-8"}
         data = json.dumps({"email": email, "password": password, "returnSecureToken": True})
         request_object = requests.post(request_ref, headers=headers, data=data)
         raise_detailed_error(request_object)

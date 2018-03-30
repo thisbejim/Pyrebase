@@ -1,1 +1,1 @@
-from .pyrebase import initialize_app
+from .pyrebase import initialize_app  # noqa
