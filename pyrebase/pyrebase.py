@@ -7,9 +7,9 @@ import socket
 import threading
 import time
 
-from gcloud import storage
 from google.auth import jwt
 from google.auth.transport.requests import AuthorizedSession
+from google.cloud import storage
 from google.oauth2 import service_account
 import requests
 from requests.exceptions import HTTPError
