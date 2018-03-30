@@ -131,6 +131,6 @@ class TestStreaming:
             db_sa().update({"2": "c"})
             db_sa().push("3")
 
-            time.sleep(2)
+            time.sleep(3)
 
             assert len(l) == 3
