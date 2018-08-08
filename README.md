@@ -1,11 +1,11 @@
-# Pyrebase3
+# Pyrebase4
 
 A simple python wrapper for the [Firebase API](https://firebase.google.com).
 
 ## Installation
 
 ```python
-pip install pyrebase3
+pip install pyrebase4
 ```
 
 ## Getting Started
