@@ -1,9 +1,0 @@
-Pyrebase3.egg-info/PKG-INFO
-Pyrebase3.egg-info/SOURCES.txt
-Pyrebase3.egg-info/dependency_links.txt
-Pyrebase3.egg-info/requires.txt
-Pyrebase3.egg-info/top_level.txt
-pyrebase/__init__.py
-pyrebase/pyrebase.py
-sseclient/__init__.py
-sseclient/sseclient.py
