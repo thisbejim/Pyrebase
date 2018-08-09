@@ -1,11 +1,11 @@
 from setuptools import setup, find_packages
 
 setup(
-    name='Pyrebase3',
-    version='4.0.0',
-    url='https://github.com/acevdog/Pyrebase',
-    description='A maintained simple python wrapper for the Firebase API',
-    author='acevedog',
+    name='Pyrebase4',
+    version='4.1.0',
+    url='https://github.com/nhorvath/Pyrebase4',
+    description='A simple python wrapper for the Firebase API with current deps',
+    author='nhorvath',
     license='MIT',
     classifiers=[
         'Development Status :: 3 - Alpha',
@@ -16,11 +16,11 @@ setup(
     keywords='Firebase',
     packages=find_packages(exclude=['tests']),
     install_requires=[
-        'requests==2.11.1',
-        'gcloud==0.17.0',
-        'oauth2client==3.0.0',
-        'requests_toolbelt==0.7.0',
-        'python_jwt==2.0.1',
-        'pycryptodome==3.4.3'
+        'requests>=2.19.1',
+        'requests_toolbelt>=0.7.1',
+        'gcloud==0.18.3',
+        'oauth2client==4.1.2',
+        'python-jwt==2.0.1',
+        'pycryptodome>=3.6.4'
     ]
 )
