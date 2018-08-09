@@ -72,7 +72,7 @@ class TestJsonKwargs:
 
     def decoder(self, obj):
         if '__type__' in obj and obj['__type__'] == datetime.datetime.__name__:
-            return datetime.datetime.utcfromtimestamp(obj['value'])
+            return datetime.datetime.fromtimestamp(obj['value'])
         return obj
 
     def test_put_fail(self, db_sa):
@@ -118,6 +118,7 @@ class TestChildNavigation:
 class TestStreaming:
     def test_create_stream_succeed(self, db_sa):
         with make_append_stream(db_sa()) as (stream, l):
+            time.sleep(2)
             assert stream is not None
 
     def test_does_initial_call(self, db_sa):
@@ -127,13 +128,22 @@ class TestStreaming:
 
     def test_responds_to_update_calls(self, db_sa):
         with make_append_stream(db_sa()) as (stream, l):
-            db_sa().set({"1": "a", "1_2": "b"})
+            testdata = {"1": "a", "1_2": "b"}
+            db_sa().set(testdata)
             db_sa().update({"2": "c"})
             db_sa().push("3")
 
             time.sleep(2)
 
-            assert len(l) == 3
+            assert len(l) > 0
+            
+            # a race condition from an earlier test causes an object with no data put to be first in the list sometimes
+            if l[0]["data"] == None:
+                assert len(l) == 4
+                assert l[1]["data"] == testdata
+            else:
+                assert len(l) == 3
+                assert l[0]["data"] == testdata
 
 class TestConditionalRequest:
      def test_conditional_set_succeed(self, db_sa):
