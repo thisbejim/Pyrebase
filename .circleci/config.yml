@@ -24,7 +24,7 @@ jobs:
           name: install dependencies
           command: |
             mkdir .venv
-            curl https://raw.githubusercontent.com/kennethreitz/pipenv/master/get-pipenv.py | python
+            curl https://raw.githubusercontent.com/kennethreitz/pipenv/master/get-pipenv.py | sudo python
             pipenv run pip install -r requirements.txt
             pipenv run pip install -r requirements.dev.txt
 
