@@ -1,0 +1,18 @@
+[
+  "tests/test_database.py::TestSimpleGetAndPut::()::test_simple_get",
+  "tests/test_database.py::TestSimpleGetAndPut::()::test_put_succeed",
+  "tests/test_database.py::TestSimpleGetAndPut::()::test_put_then_get_keeps_value",
+  "tests/test_database.py::TestSimpleGetAndPut::()::test_put_dictionary",
+  "tests/test_database.py::TestSimpleGetAndPut::()::test_put_deeper_dictionnary",
+  "tests/test_database.py::TestJsonKwargs::()::test_put_fail",
+  "tests/test_database.py::TestJsonKwargs::()::test_put_succeed",
+  "tests/test_database.py::TestJsonKwargs::()::test_put_then_get_succeed",
+  "tests/test_database.py::TestChildNavigation::()::test_get_child_none",
+  "tests/test_database.py::TestChildNavigation::()::test_get_child_after_pushing_data",
+  "tests/test_database.py::TestChildNavigation::()::test_update_child",
+  "tests/test_database.py::TestChildNavigation::()::test_path_equivalence",
+  "tests/test_database.py::TestStreaming::()::test_create_stream_succeed",
+  "tests/test_database.py::TestStreaming::()::test_does_initial_call",
+  "tests/test_database.py::TestStreaming::()::test_responds_to_update_calls",
+  "tests/test_setup.py::test_setup"
+]
