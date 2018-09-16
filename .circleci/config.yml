@@ -24,7 +24,8 @@ jobs:
           name: install dependencies
           command: |
             mkdir .venv
-            pip install --upgrade --user pipenv pip
+            pip install --upgrade --user pip
+            curl https://raw.githubusercontent.com/kennethreitz/pipenv/master/get-pipenv.py | python
             pipenv run pip install -r requirements.txt
             pipenv run pip install -r requirements.dev.txt
 
