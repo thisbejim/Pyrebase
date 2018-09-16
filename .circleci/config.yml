@@ -41,12 +41,20 @@ jobs:
       - store_artifacts:
           path: test-reports
           destination: test-reports
-
+  deploy:
       - run:
           name: Push to GemFury
           command: |
             git remote add fury https://clintontalli@git.fury.io/clintontalli/Pyrebase.git
             git push --set-upstream fury master
+
+workflows:
+  version: 2
+  build_deploy:
+    jobs:
+      - build
+      - deploy:
           filters:
-            branches:
-              only: master
+              branches:
+                only: master
+
