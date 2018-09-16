@@ -42,6 +42,9 @@ jobs:
           path: test-reports
           destination: test-reports
   deploy:
+    docker:
+      - image: circleci/python:3.6.1
+    steps:
       - run:
           name: Push to GemFury
           command: |
@@ -57,4 +60,3 @@ workflows:
           filters:
               branches:
                 only: master
-
