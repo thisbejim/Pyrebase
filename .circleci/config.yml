@@ -46,10 +46,11 @@ jobs:
       - image: circleci/python:3.6.1
     working_directory: ~/repo
     steps:
+      - checkout
       - run:
           name: Push to GemFury
           command: |
-            bash deploy_to_gemfury.sh
+            bash ~/repo/deploy_to_gemfury.sh
 
 workflows:
   version: 2
@@ -57,6 +58,8 @@ workflows:
     jobs:
       - build
       - deploy:
+          requires:
+              - build
           filters:
               branches:
                 only: master
