@@ -2,8 +2,8 @@ from setuptools import setup, find_packages
 
 setup(
     name='Pyrebase',
-    version='3.1.0',
-    url='https://github.com/thisbejim/Pyrebase',
+    version='3.1.1',
+    url='https://github.com/talli-software/Pyrebase',
     description='A simple python wrapper for the Firebase API',
     author='James Childs-Maidment',
     license='MIT',
