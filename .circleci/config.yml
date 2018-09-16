@@ -48,8 +48,7 @@ jobs:
       - run:
           name: Push to GemFury
           command: |
-            git remote add fury https://clintontalli@git.fury.io/clintontalli/Pyrebase.git
-            git push --set-upstream fury master
+            bash deploy_to_gemfury.sh
 
 workflows:
   version: 2
