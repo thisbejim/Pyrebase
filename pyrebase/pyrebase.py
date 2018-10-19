@@ -11,7 +11,7 @@ import math
 from random import randrange
 import time
 from collections import OrderedDict
-from sseclient import SSEClient
+from .pyre_sseclient import SSEClient
 import threading
 import socket
 from oauth2client.service_account import ServiceAccountCredentials
