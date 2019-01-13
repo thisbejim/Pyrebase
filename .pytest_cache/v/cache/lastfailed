@@ -1,6 +1,0 @@
-{
-  "tests/test_database.py::TestChildNavigation::()": true,
-  "tests/test_database.py::TestJsonKwargs::()": true,
-  "tests/test_database.py::TestSimpleGetAndPut::()": true,
-  "tests/test_database.py::TestStreaming::()": true
-}
