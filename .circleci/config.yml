@@ -6,7 +6,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: circleci/python:3.6.1
+      - image: circleci/python:3.7.0
 
     working_directory: ~/repo
 
@@ -27,7 +27,6 @@ jobs:
             curl https://raw.githubusercontent.com/kennethreitz/pipenv/master/get-pipenv.py | sudo python
             pipenv run pip install -r requirements.txt
             pipenv run pip install -r requirements.dev.txt
-
       - save_cache:
           paths:
             - ./venv
@@ -43,7 +42,7 @@ jobs:
           destination: test-reports
   deploy:
     docker:
-      - image: circleci/python:3.6.1
+      - image: circleci/python:3.7.0
     working_directory: ~/repo
     steps:
       - checkout
