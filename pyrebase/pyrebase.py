@@ -86,6 +86,8 @@ class Auth:
         self.requests = requests
         self.credentials = credentials
 
+
+
     def sign_in_with_email_and_password(self, email, password):
         request_ref = "https://www.googleapis.com/identitytoolkit/v3/relyingparty/verifyPassword?key={0}".format(self.api_key)
         headers = {"content-type": "application/json; charset=UTF-8"}
@@ -157,7 +159,15 @@ class Auth:
         raise_detailed_error(request_object)
         return request_object.json()
 
-    def verify_password_reset_code(self, reset_code, new_password):
+    def verify_password_reset_code(self,reset_code):
+        request_ref = "https://www.googleapis.com/identitytoolkit/v3/relyingparty/resetPassword?key={0}".format(self.api_key)
+        headers = {"content-type": "application/json; charset=UTF-8"}
+        data = json.dumps({"oobCode": reset_code})
+        request_object = requests.post(request_ref, headers=headers, data=data)
+        raise_detailed_error(request_object)
+        return request_object.json()
+
+    def confirm_password_reset(self, reset_code, new_password):
         request_ref = "https://www.googleapis.com/identitytoolkit/v3/relyingparty/resetPassword?key={0}".format(self.api_key)
         headers = {"content-type": "application/json; charset=UTF-8"}
         data = json.dumps({"oobCode": reset_code, "newPassword": new_password})
@@ -173,6 +183,127 @@ class Auth:
         raise_detailed_error(request_object)
         return request_object.json()
 
+    def create_anonymous_user(self):
+        request_ref = "https://www.googleapis.com/identitytoolkit/v3/relyingparty/signupNewUser?key={0}".format(self.api_key)
+        headers = {"content-type": "application/json; charset=UTF-8"}
+        data = json.dumps({"returnSecureToken": True})
+        request_object = requests.post(request_ref, headers=headers, data=data)
+        raise_detailed_error(request_object)
+        return request_object.json()
+
+    def sign_in_with_oauth_token(self, request_uri, post_body, returnIdpCredential=True):
+        '''
+        Sign in with OAuth credential
+        You can sign in a user with an OAuth credential by issuing an HTTP POST request to the Auth verifyAssertion endpoint.
+
+        Use this if you want to login with facebook, github, instagram accounts, etc.
+        INPUT:
+        requestUri  string  The URI to which the IDP redirects the user back.
+        postBody    string  Contains the OAuth credential (an ID token or access token) and provider ID which issues the credential.
+        https://firebase.google.com/docs/reference/rest/auth/#section-sign-in-with-oauth-credential
+        
+        example: 
+        curl 'https://www.googleapis.com/identitytoolkit/v3/relyingparty/verifyAssertion?key=[API_KEY]' \
+        -H 'Content-Type: application/json' \
+        --data-binary '{"postBody":"id_token=[GOOGLE_ID_TOKEN]&providerId=[google.com]","requestUri":"[http://localhost]","returnIdpCredential":true,"returnSecureToken":true}'
+
+        In the example above, you would replace [API_KEY] with the Web API Key of your Firebase project, [GOOGLE_ID_TOKEN] with the Google OAuth ID token, [google.com] with the 
+        provider ID corresponding to the OAuth credential and [http://localhost] with the request URI.
+        
+        example response:
+        {
+          "kind": "identitytoolkit#VerifyAssertionResponse",
+          "federatedId": "http://facebook.com/1234567890",
+          "providerId": "facebook.com",
+          "localId": "5xwsPCWYo...",
+          "emailVerified": true,
+          "email": "user@example.com",
+          "oauthAccessToken": "[FACEBOOK_ACCESS_TOKEN]",
+          "firstName": "John",
+          "lastName": "Doe",
+          "fullName": "John Doe",
+          "displayName": "John Doe",
+          "idToken": "[ID_TOKEN]",
+          "photoUrl": "https://scontent.xx.fbcdn.net/v/...",
+          "refreshToken": "[REFRESH_TOKEN]",
+          "expiresIn": "3600",
+          "rawUserInfo": "{\"updated_time\":\"2017-02-22T01:10:57+0000\",\"gender\":\"male\", ...}"
+        }
+
+        RESPONSE - JSON object with the following:
+        Property            Type        Description
+        kind                string      The request type, always "identitytoolkit#VerifyAssertionResponse".
+        federatedId         string      The unique ID identifies the IdP account.
+        providerId          string      The linked provider ID (e.g. "google.com" for the Google provider).
+        localId             string      The uid of the authenticated user.
+        emailVerified       boolean     Whether the sign-in email is verified.
+        email               string      The email of the account.
+        oauthIdToken        string      The OIDC id token if available.
+        oauthAccessToken    string      The OAuth access token if available.
+        oauthTokenSecret    string      The OAuth 1.0 token secret if available.
+        rawUserInfo         string      The stringified JSON response containing all the IdP data corresponding to the provided OAuth credential.
+        firstName           string      The first name for the account.
+        lastName            string      The last name for the account.
+        fullName            string      The full name for the account.
+        displayName         string      The display name for the account.
+        photoUrl            string      The photo Url for the account.
+        idToken             string      A Firebase Auth ID token for the authenticated user.
+        refreshToken        string      A Firebase Auth refresh token for the authenticated user.
+        expiresIn           string      The number of seconds in which the ID token expires.
+        needConfirmation    boolean     Whether another account with the same credential already exists. The user will need to sign in to the original account and then link the current credential to it
+        '''
+        request_ref = "https://www.googleapis.com/identitytoolkit/v3/relyingparty/verifyAssertion?key={0}".format(self.api_key)
+        headers = {"content-type": "application/json; charset=UTF-8"}
+        json_dictionary = {
+            "requestUri": request_uri,
+            "postBody": post_body,
+            "returnSecureToken": True,
+            "returnIdpCredential": returnIdpCredential
+        }
+        data = json.dumps(json_dictionary)
+        request_object = requests.post(request_ref, headers=headers, data=data)
+        raise_detailed_error(request_object)
+        return request_object.json()
+
+    def fetch_providers_for_email_address(self, email_address, continue_uri):
+        '''
+        You can look all providers associated with a specified email by issuing an HTTP POST request to the Auth createAuthUri endpoint.
+        Input 
+        Property Name   Type    Description
+        identifier      string  User's email address
+        continueUri     string  The URI to which the IDP redirects the user back. For this use case, this is just the current URL.
+        
+        Output
+        Property Name   Type    Description
+        kind    string  The request type, always "identitytoolkit#CreateAuthUriResponse".
+        allProviders    List of strings The list of providers that the user has previously signed in with.
+        registered  boolean Whether the email is for an existing account
+
+        Example request:
+        curl 'https://www.googleapis.com/identitytoolkit/v3/relyingparty/createAuthUri?key=[API_KEY]' \
+        -H 'Content-Type: application/json' \
+        --data-binary '{"identifier":"[user@example.com]","continueUri":"[http://localhost:8080/app]"}'
+        
+        Example response:
+        {
+          "kind": "identitytoolkit#CreateAuthUriResponse",
+          "allProviders": [
+            "password",
+            "google.com"
+          ],
+          "registered": true
+        }
+        '''
+        request_ref = "https://www.googleapis.com/identitytoolkit/v3/relyingparty/createAuthUri?key={0}".format(self.api_key)
+        headers = {"content-type": "application/json; charset=UTF-8"}
+        json_dictionary = {
+            "identifier": email_address,
+            "continueUri": continue_uri,
+        }
+        data = json.dumps(json_dictionary)
+        request_object = requests.post(request_ref, headers=headers, data=data)
+        raise_detailed_error(request_object)
+        return request_object.json()
 
 class Database:
     """ Database Service """
