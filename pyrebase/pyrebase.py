@@ -79,14 +79,28 @@ class Firebase:
 
 
 class Auth:
-    """ Authentication Service """
+    """ 
+    Authentication Service 
+    For errors, they follow the format along the lines of this:
+    {
+      "error": {
+        "errors": [
+          {
+            "domain": "global",
+            "reason": "invalid",
+            "message": "CREDENTIAL_TOO_OLD_LOGIN_AGAIN"
+          }
+        ],
+        "code": 400,
+        "message": "CREDENTIAL_TOO_OLD_LOGIN_AGAIN"
+      }
+    }
+    """
     def __init__(self, api_key, requests, credentials):
         self.api_key = api_key
         self.current_user = None
         self.requests = requests
         self.credentials = credentials
-
-
 
     def sign_in_with_email_and_password(self, email, password):
         request_ref = "https://www.googleapis.com/identitytoolkit/v3/relyingparty/verifyPassword?key={0}".format(self.api_key)
@@ -160,6 +174,9 @@ class Auth:
         return request_object.json()
 
     def verify_password_reset_code(self,reset_code):
+        '''
+        https://firebase.google.com/docs/reference/rest/auth/#section-verify-password-reset-code
+        '''
         request_ref = "https://www.googleapis.com/identitytoolkit/v3/relyingparty/resetPassword?key={0}".format(self.api_key)
         headers = {"content-type": "application/json; charset=UTF-8"}
         data = json.dumps({"oobCode": reset_code})
@@ -168,6 +185,9 @@ class Auth:
         return request_object.json()
 
     def confirm_password_reset(self, reset_code, new_password):
+        '''
+        https://firebase.google.com/docs/reference/rest/auth/#section-confirm-reset-password
+        '''
         request_ref = "https://www.googleapis.com/identitytoolkit/v3/relyingparty/resetPassword?key={0}".format(self.api_key)
         headers = {"content-type": "application/json; charset=UTF-8"}
         data = json.dumps({"oobCode": reset_code, "newPassword": new_password})
