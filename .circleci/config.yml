@@ -6,7 +6,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: circleci/python:3.7.0
+      - image: circleci/python:3.6.1
 
     working_directory: ~/repo
 
@@ -42,7 +42,7 @@ jobs:
           destination: test-reports
   deploy:
     docker:
-      - image: circleci/python:3.7.0
+      - image: circleci/python:3.6.1
     working_directory: ~/repo
     steps:
       - checkout
