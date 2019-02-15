@@ -17,7 +17,7 @@ setup(
     packages=find_packages(exclude=['tests']),
     install_requires=[
         'requests==2.21.0',
-        'gcloud==0.17.0',
+        'gcloud>=0.17.0',
         'oauth2client==3.0.0',
         'requests_toolbelt==0.7.1',
         'python_jwt==2.0.1',
