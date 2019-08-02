@@ -378,9 +378,9 @@ The put method takes the path to the local file and an optional user token.
 ```python
 storage = firebase.storage()
 # as admin
-storage.child("images/example.jpg").put("example2.jpg")
+file = storage.child("images/example.jpg").put("example2.jpg")
 # as user
-storage.child("images/example.jpg").put("example2.jpg", user['idToken'])
+file = storage.child("images/example.jpg").put("example2.jpg", user['idToken'])
 ```
 
 ### download
@@ -396,7 +396,7 @@ storage.child("images/example.jpg").download("downloaded.jpg")
 The get_url method takes the path to the saved database file and returns the storage url.
 
 ```
-storage.child("images/example.jpg").get_url()
+storage.child("images/example.jpg").get_url(file['downloadTokens'])
 # https://firebasestorage.googleapis.com/v0/b/storage-url.appspot.com/o/images%2Fexample.jpg?alt=media
 ```
 
