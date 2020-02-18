@@ -1,1 +1,1 @@
-from .sseclient import SSEClient
+from .sseclient import SSEClient  # noqa

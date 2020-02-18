@@ -72,7 +72,7 @@ class TestJsonKwargs:
 
     def decoder(self, obj):
         if '__type__' in obj and obj['__type__'] == datetime.datetime.__name__:
-            return datetime.datetime.utcfromtimestamp(obj['value'])
+            return datetime.datetime.fromtimestamp(obj['value'])
         return obj
 
     def test_put_fail(self, db_sa):
@@ -131,6 +131,6 @@ class TestStreaming:
             db_sa().update({"2": "c"})
             db_sa().push("3")
 
-            time.sleep(2)
+            time.sleep(3)
 
             assert len(l) == 3

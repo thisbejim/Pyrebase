@@ -1,15 +1,14 @@
 import re
 import time
 import warnings
-import threading
 import six
 
 import requests
 
-
 # Technically, we should support streams that mix line endings.  This regex,
 # however, assumes that a system will provide consistent line endings.
 end_of_field = re.compile(r'\r\n\r\n|\r\r|\n\n')
+
 
 class SSEClient(object):
     def __init__(self, url, session, build_headers, last_id=None, retry=3000, **kwargs):
