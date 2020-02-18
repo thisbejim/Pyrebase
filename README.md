@@ -2,6 +2,10 @@
 
 A simple python wrapper for the [Firebase API](https://firebase.google.com).
 
+## Support
+
+Does your business or project depend on Pyrebase? Reach out to pibals@protonmail.com
+
 ## Installation
 
 ```python
