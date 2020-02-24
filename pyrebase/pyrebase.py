@@ -359,6 +359,42 @@ class Database:
         data = sorted(dict(new_list).items(), key=lambda item: item[1][by_key])
         return PyreResponse(convert_to_pyre(data), origin.key())
 
+    def get_etag(self, token=None, json_kwargs={}):
+        request_ref = self.build_request_url(token)
+        headers = self.build_headers(token)
+        # extra header to get ETag
+        headers['X-Firebase-ETag'] = 'true'
+        request_object = self.requests.get(request_ref, headers=headers)
+        raise_detailed_error(request_object)
+        return request_object.headers['ETag']
+
+    def conditional_set(self, data, etag, token=None, json_kwargs={}):
+        request_ref = self.check_token(self.database_url, self.path, token)
+        self.path = ""
+        headers = self.build_headers(token)
+        headers['if-match'] = etag
+        request_object = self.requests.put(request_ref, headers=headers, data=json.dumps(data, **json_kwargs).encode("utf-8"))
+        
+        # ETag didn't match, so we should return the correct one for the user to try again
+        if request_object.status_code == 412:
+            return {'ETag': request_object.headers['ETag']}
+
+        raise_detailed_error(request_object)
+        return request_object.json()
+
+    def conditional_remove(self, etag, token=None):
+        request_ref = self.check_token(self.database_url, self.path, token)
+        self.path = ""
+        headers = self.build_headers(token)
+        headers['if-match'] = etag
+        request_object = self.requests.delete(request_ref, headers=headers)
+
+        # ETag didn't match, so we should return the correct one for the user to try again
+        if request_object.status_code == 412:
+            return {'ETag': request_object.headers['ETag']}
+
+        raise_detailed_error(request_object)
+        return request_object.json()
 
 class Storage:
     """ Storage Service """
