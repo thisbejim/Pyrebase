@@ -438,6 +438,28 @@ class Storage:
     def list_files(self):
         return self.bucket.list_blobs()
 
+    def get(self, token=None):
+        path = self.path
+        self.path = None
+        if path.startswith('/'):
+            path = path[1:]
+
+        request_ref = "{0}/o/{1}?".format(self.storage_bucket, quote(path, safe=''))
+
+        if token:
+            headers = {"Authorization": "Firebase " + token}
+            request_object = self.requests.get(request_ref, headers=headers)
+            raise_detailed_error(request_object)
+            return request_object.json()
+        elif self.credentials:
+            blob = self.bucket.get_blob(path)
+            import copy
+            return copy.deepcopy(blob._properties)
+        else:
+            request_object = self.requests.get(request_ref)
+            raise_detailed_error(request_object)
+            return request_object.json()
+
 
 def raise_detailed_error(request_object):
     try:

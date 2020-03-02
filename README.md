@@ -387,6 +387,14 @@ storage.child("images/example.jpg").put("example2.jpg")
 storage.child("images/example.jpg").put("example2.jpg", user['idToken'])
 ```
 
+### get
+
+To return path properties simply call the ```get()``` method. The method will return a dict with properties and metadata associated with the object.
+
+```python
+props = storage.child("images/example.jpg").get()
+```
+
 ### download
 
 The download method takes the path to the saved database file and the name you want the downloaded file to have.
