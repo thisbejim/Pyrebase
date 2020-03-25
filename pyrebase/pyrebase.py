@@ -526,8 +526,11 @@ class ClosableSSEClient(SSEClient):
     def close(self):
         self.should_connect = False
         self.retry = 0
-        self.resp.raw._fp.fp.raw._sock.shutdown(socket.SHUT_RDWR)
-        self.resp.raw._fp.fp.raw._sock.close()
+        try:
+            self.resp.raw._fp.fp._sock.shutdown(socket.SHUT_RDWR)
+            self.resp.raw._fp.fp._sock.close()
+        except AttributeError:
+            pass
 
 
 class Stream:
@@ -567,5 +570,4 @@ class Stream:
             time.sleep(0.001)
         self.sse.running = False
         self.sse.close()
-        self.thread.join()
         return self
