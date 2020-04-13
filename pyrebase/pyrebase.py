@@ -4,7 +4,7 @@ from requests.exceptions import HTTPError
 
 try:
     from urllib.parse import urlencode, quote
-except:
+except ImportError:
     from urllib import urlencode, quote
 import json
 import math
@@ -324,8 +324,7 @@ class Database:
     def check_token(self, database_url, path, token):
         if token:
             return '{0}{1}.json?auth={2}'.format(database_url, path, token)
-        else:
-            return '{0}{1}.json'.format(database_url, path)
+        return '{0}{1}.json'.format(database_url, path)
 
     def generate_key(self):
         push_chars = '-0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz'
@@ -399,8 +398,7 @@ class Storage:
             blob = self.bucket.blob(path)
             if isinstance(file, str):
                 return blob.upload_from_filename(filename=file)
-            else:
-                return blob.upload_from_file(file_obj=file)
+            return blob.upload_from_file(file_obj=file)
         else:
             request_object = self.requests.post(request_ref, data=file_object)
             raise_detailed_error(request_object)
