@@ -2,6 +2,7 @@ import datetime
 import random
 import time
 from contextlib import contextmanager
+from requests.exceptions import ConnectTimeout
 
 import pytest
 
@@ -58,6 +59,27 @@ class TestSimpleGetAndPut:
 
         # gives: assert [None, {'11': {'111': 42}}] == {'1': {'11': {'111': 42}}}
         assert db_sa().get().val() == v
+
+
+class TestTimeout:
+    def test_get_with_timeout_none(self, db_sa):
+        db_sa().set_timeout(timeout=None)
+        assert db_sa().get().val() is None
+
+    def test_get_failed_with_set_timeout(self, db_sa):
+        instance = db_sa().set_timeout(timeout=0.001)
+        with pytest.raises(ConnectTimeout):
+            instance.get().val()
+
+    def test_get_failed_with_timeout_arg(self, db_sa):
+        with pytest.raises(ConnectTimeout):
+            db_sa().get(timeout=0.001).val()
+
+    def test_set_timeout_and_overwrite_arg(self, db_sa):
+        instance = db_sa().set_timeout(timeout=0.001)
+        assert instance.get(timeout=60).val() is None
+        with pytest.raises(ConnectTimeout):
+            instance.get().val()
 
 
 class TestJsonKwargs:
