@@ -395,6 +395,15 @@ The download method takes the path to the saved database file and the name you w
 storage.child("images/example.jpg").download("downloaded.jpg")
 ```
 
+## Delete
+
+The delete method takes the path to the file you wish to delete
+A service account is required
+
+```
+storage.delete("images/toDelete.jpg")
+```
+
 ### get_url
 
 The get_url method takes the path to the saved database file and returns the storage url.
