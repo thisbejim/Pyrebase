@@ -95,7 +95,7 @@ results = db.child("users").push(data, user['idToken'])
 ### Token expiry
 
 A user's idToken expires after 1 hour, so be sure to use the user's refreshToken to avoid stale tokens.
-```
+```python
 user = auth.sign_in_with_email_and_password(email, password)
 # before the 1 hour expiry:
 user = auth.refresh(user['refreshToken'])
@@ -106,15 +106,15 @@ user['idToken']
 ### Custom tokens
 
 You can also create users using [custom tokens](https://firebase.google.com/docs/auth/server/create-custom-tokens), for example:
-```
+```python
 token = auth.create_custom_token("your_custom_id")
 ```
 You can also pass in additional claims.
-```
+```python
 token_with_additional_claims = auth.create_custom_token("your_custom_id", {"premium_account": True})
 ```
 You can then send these tokens to the client to sign in, or sign in as the user on the server.
-```
+```python
 user = auth.sign_in_with_custom_token(token)
 ```
 
@@ -231,7 +231,7 @@ db.update(data)
 #### val
 Queries return a PyreResponse object. Calling ```val()``` on these objects returns the query data.
 
-```
+```python
 users = db.child("users").get()
 print(users.val()) # {"Morty": {"name": "Mortimer 'Morty' Smith"}, "Rick": {"name": "Rick Sanchez"}}
 ```
@@ -239,7 +239,7 @@ print(users.val()) # {"Morty": {"name": "Mortimer 'Morty' Smith"}, "Rick": {"nam
 #### key
 Calling ```key()``` returns the key for the query data.
 
-```
+```python
 user = db.child("users").get()
 print(user.key()) # users
 ```
@@ -247,7 +247,7 @@ print(user.key()) # users
 #### each
 Returns a list of objects on each of which you can call ```val()``` and ```key()```.
 
-```
+```python
 all_users = db.child("users").get()
 for user in all_users.each():
     print(user.key()) # Morty
@@ -291,7 +291,7 @@ You should at least handle `put` and `patch` events. Refer to ["Streaming from t
 
 You can also add a ```stream_id``` to help you identify a stream if you have multiple running:
 
-```
+```python
 my_stream = db.child("posts").stream(stream_handler, stream_id="new_posts")
 ```
 
@@ -387,11 +387,19 @@ storage.child("images/example.jpg").put("example2.jpg")
 storage.child("images/example.jpg").put("example2.jpg", user['idToken'])
 ```
 
+### delete
+
+The delete method takes the path to the saved database file.
+
+```python
+storage.delete("images/example.jpg")
+```
+
 ### download
 
 The download method takes the path to the saved database file and the name you want the downloaded file to have.
 
-```
+```python
 storage.child("images/example.jpg").download("downloaded.jpg")
 ```
 
@@ -399,7 +407,7 @@ storage.child("images/example.jpg").download("downloaded.jpg")
 
 The get_url method takes the path to the saved database file and returns the storage url.
 
-```
+```python
 storage.child("images/example.jpg").get_url()
 # https://firebasestorage.googleapis.com/v0/b/storage-url.appspot.com/o/images%2Fexample.jpg?alt=media
 ```

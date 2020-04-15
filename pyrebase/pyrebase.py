@@ -435,8 +435,8 @@ class Storage:
             return "{0}/o/{1}?alt=media&token={2}".format(self.storage_bucket, quote(path, safe=''), token)
         return "{0}/o/{1}?alt=media".format(self.storage_bucket, quote(path, safe=''))
 
-    def list_files(self):
-        return self.bucket.list_blobs()
+    def list_files(self, prefix=None):
+        return self.bucket.list_blobs(prefix=prefix)
 
 
 def raise_detailed_error(request_object):
