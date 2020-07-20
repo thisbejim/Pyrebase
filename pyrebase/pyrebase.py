@@ -426,7 +426,7 @@ class Storage:
                     for chunk in r:
                         f.write(chunk)
 
-    def get_url(self, token):
+    def get_url(self, token=None):
         path = self.path
         self.path = None
         if path.startswith('/'):
