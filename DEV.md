@@ -37,6 +37,7 @@ Building
 1. Install/Update build dependencies:
 `pip install --upgrade pip setuptools wheel twine`
 1. Increment the version number in setup.py
+1. Clean the `dist/` directory
 1. Create the package files:
 `python setup.py sdist bdist_wheel`
 1. Upload to test pypi repo:
