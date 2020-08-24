@@ -334,9 +334,9 @@ class Database:
         raise_detailed_error(request_object)
         return request_object.json()
 
-    def stream(self, stream_handler, token=None, stream_id=None):
+    def stream(self, stream_handler, token=None, stream_id=None, is_async=True):
         request_ref = self.build_request_url(token)
-        return Stream(request_ref, stream_handler, self.build_headers, stream_id)
+        return Stream(request_ref, stream_handler, self.build_headers, stream_id, is_async)
 
     def check_token(self, database_url, path, token):
         if token:
@@ -593,14 +593,18 @@ class ClosableSSEClient(SSEClient):
 
 
 class Stream:
-    def __init__(self, url, stream_handler, build_headers, stream_id):
+    def __init__(self, url, stream_handler, build_headers, stream_id, is_async):
         self.build_headers = build_headers
         self.url = url
         self.stream_handler = stream_handler
         self.stream_id = stream_id
         self.sse = None
         self.thread = None
-        self.start()
+
+        if is_async:
+            self.start()
+        else:
+            self.start_stream()
 
     def make_session(self):
         """
