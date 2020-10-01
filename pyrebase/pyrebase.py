@@ -530,7 +530,7 @@ class PyreResponse:
        return self.pyres[index]
 
     def val(self):
-        if isinstance(self.pyres, list):
+        if isinstance(self.pyres, list) and self.pyres:
             # unpack pyres into OrderedDict
             pyre_list = []
             # if firebase response was a list
