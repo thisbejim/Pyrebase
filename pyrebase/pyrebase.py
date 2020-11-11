@@ -6,7 +6,10 @@ try:
     from urllib.parse import urlencode, quote
 except:
     from urllib import urlencode, quote
-import json
+try:
+    import simplejson as json
+except:
+    import json
 import math
 from random import uniform
 import time
