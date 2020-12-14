@@ -299,7 +299,7 @@ class Database:
             elif build_query["orderBy"] == "$value":
                 sorted_response = sorted(request_dict.items(), key=lambda item: item[1])
             else:
-                sorted_response = sorted(request_dict.items(), key=lambda item: item[1][build_query["orderBy"]])
+                sorted_response = sorted(request_dict.items(), key=lambda item: (build_query["orderBy"] in item[1], item[1].get(build_query["orderBy"], ""))
         return PyreResponse(convert_to_pyre(sorted_response), query_key)
 
     def push(self, data, token=None, json_kwargs={}):
