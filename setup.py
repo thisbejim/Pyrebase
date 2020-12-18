@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='Pyrebase4',
-    version='4.4.1',
+    version='4.4.2',
     url='https://github.com/nhorvath/Pyrebase4',
     description='A simple python wrapper for the Firebase API with current deps',
     author='nhorvath',
@@ -18,9 +18,9 @@ setup(
     install_requires=[
         'requests>=2.19.1',
         'requests_toolbelt>=0.7.1',
-        'gcloud==0.18.3',
-        'oauth2client==4.1.2',
-        'python-jwt==2.0.1',
+        'gcloud>=0.18.3',
+        'oauth2client>=4.1.2',
+        'python-jwt>=2.0.1',
         'pycryptodome>=3.6.4'
     ]
 )
