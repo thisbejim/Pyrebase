@@ -50,7 +50,7 @@ class Firebase:
                 self.credentials = ServiceAccountCredentials.from_json_keyfile_dict(config["serviceAccount"], scopes)
         if is_appengine_sandbox():
             # Fix error in standard GAE environment
-            # is releated to https://github.com/kennethreitz/requests/issues/3187
+            # is related to https://github.com/kennethreitz/requests/issues/3187
             # ProtocolError('Connection aborted.', error(13, 'Permission denied'))
             adapter = appengine.AppEngineAdapter(max_retries=3)
         else:
