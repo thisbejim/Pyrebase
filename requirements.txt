@@ -5,3 +5,4 @@ requests-toolbelt==0.7.0
 python-jwt==2.0.1
 pycrypto==2.6.1
 rsa>=4.7 # not directly required, pinned by Snyk to avoid a vulnerability
+urllib3>=1.25.9 # not directly required, pinned by Snyk to avoid a vulnerability
