@@ -1,5 +1,8 @@
 from setuptools import setup, find_packages
 
+with open("README.md", "r") as fh:
+    long_description = fh.read()
+
 setup(
     name='Pyrebase',
     version='3.0.27',
@@ -7,6 +10,8 @@ setup(
     description='A simple python wrapper for the Firebase API',
     author='James Childs-Maidment',
     license='MIT',
+    long_description=long_description,
+    long_description_content_type="text/markdown",
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Intended Audience :: Developers',
