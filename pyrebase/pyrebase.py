@@ -235,7 +235,7 @@ class Database:
             parameters['auth'] = token
         for param in list(self.build_query):
             if type(self.build_query[param]) is str:
-                parameters[param] = quote('"' + self.build_query[param] + '"')
+                parameters[param] = '"' + self.build_query[param] + '"'
             elif type(self.build_query[param]) is bool:
                 parameters[param] = "true" if self.build_query[param] else "false"
             else:
