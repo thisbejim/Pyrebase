@@ -86,6 +86,12 @@ class Auth:
         self.current_user = request_object.json()
         return request_object.json()
 
+    def sign_in_anonymously(self):
+        request_ref = "https://identitytoolkit.googleapis.com/v1/accounts:signUp?key={0}".format(self.api_key)
+        response = requests.post(request_ref, json={'returnSecureToken': True})
+        self.current_user = response.json()
+        return response.json()
+
     def create_custom_token(self, uid, additional_claims=None):
         service_account_email = self.credentials.service_account_email
         private_key = RSA.importKey(self.credentials._private_key_pkcs8_pem)
