@@ -426,14 +426,26 @@ class Storage:
                     for chunk in r:
                         f.write(chunk)
 
-    def get_url(self, token):
+    def get_url(self, token=None, expiration=datetime.timedelta(hours=12)):
+        if not isinstance(expiration, datetime.timedelta):
+            raise Exception("'expiration' parameter must be of type datetime.timedelta") 
+
         path = self.path
         self.path = None
         if path.startswith('/'):
             path = path[1:]
+
+        # if service account was provided, calling api to get a signed URL
+        if self.credentials:
+            blob = self.bucket.get_blob(path)
+            if not blob:
+              return None
+            return blob.generate_signed_url(expiration, method='GET')
+        
         if token:
             return "{0}/o/{1}?alt=media&token={2}".format(self.storage_bucket, quote(path, safe=''), token)
         return "{0}/o/{1}?alt=media".format(self.storage_bucket, quote(path, safe=''))
+
 
     def list_files(self):
         return self.bucket.list_blobs()
