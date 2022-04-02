@@ -282,8 +282,18 @@ class Database:
             elif build_query["orderBy"] == "$value":
                 sorted_response = sorted(request_dict.items(), key=lambda item: item[1])
             else:
-                sorted_response = sorted(request_dict.items(), key=lambda item: item[1][build_query["orderBy"]])
+                path = build_query["orderBy"].split("/")
+                sorted_response = sorted(request_dict.items(), key=lambda item: self._walk(item[1], path))
         return PyreResponse(convert_to_pyre(sorted_response), query_key)
+
+    def _walk(self, obj, path):
+        if path[0] in obj:
+            if len(path) == 1:
+                return obj[path[0]]
+            else:
+                return self._walk(obj[path[0]], path[1:])
+        else:
+            raise Exception("Keys '{}' not found in {}".format(path[0], obj))
 
     def push(self, data, token=None, json_kwargs={}):
         request_ref = self.check_token(self.database_url, self.path, token)
