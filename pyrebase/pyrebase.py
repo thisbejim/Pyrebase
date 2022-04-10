@@ -429,10 +429,18 @@ class Storage:
     def get_url(self, token):
         path = self.path
         self.path = None
+        headers = {}
         if path.startswith('/'):
             path = path[1:]
         if token:
-            return "{0}/o/{1}?alt=media&token={2}".format(self.storage_bucket, quote(path, safe=''), token)
+            headers = {"Authorization": "Firebase " + token}
+        # retrieve download tokens first
+        request_ref = "{0}/o/{1}".format(self.storage_bucket, quote(path, safe=''))
+        request_object = self.requests.post(request_ref, headers=headers)
+        raise_detailed_error(request_object)
+        access_tokens = request_object.json()['downloadTokens'].split(",")
+        if len(access_tokens) > 0:
+            return "{0}/o/{1}?alt=media&token={2}".format(self.storage_bucket, quote(path, safe=''), access_tokens[0])
         return "{0}/o/{1}?alt=media".format(self.storage_bucket, quote(path, safe=''))
 
     def list_files(self):
