@@ -2,6 +2,11 @@
 
 A simple python wrapper for the [Firebase API](https://firebase.google.com).
 
+## Features
+[Authentication](https://github.com/thisbejim/Pyrebase/edit/master/README.md#authentication)  
+[Real time Database](https://github.com/thisbejim/Pyrebase/edit/master/README.md#database)      
+[Storage](https://github.com/thisbejim/Pyrebase/edit/master/README.md#storage)
+
 ## Support
 
 Does your business or project depend on Pyrebase? Reach out to pibals@protonmail.com
