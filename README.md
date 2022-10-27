@@ -362,6 +362,17 @@ When using ```order_by_value()```, children are ordered by their value.
 users_by_value = db.child("users").order_by_value().get()
 ```
 
+#### retrieve snapshot of db
+
+```python
+users = db.child().get()
+```
+
+#### retrieve snapshot with idToken
+
+```python
+users = db.child().get(user['idToken'])
+```
 
 ## Storage
 
