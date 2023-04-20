@@ -31,7 +31,12 @@ def initialize_app(config):
 class Firebase:
     """ Firebase Interface """
     def __init__(self, config):
-        self.api_key = config["apiKey"]
+        if config.get("apiKey"):
+            self.api_key = config["apiKey"]
+        else:
+            with open(config["serviceAccount"],'r') as file:
+                data = file.read()
+                self.api_key = json.loads(data)["private_key"]
         self.auth_domain = config["authDomain"]
         self.database_url = config["databaseURL"]
         self.storage_bucket = config["storageBucket"]
