@@ -400,7 +400,11 @@ class Storage:
             if isinstance(file, str):
                 return blob.upload_from_filename(filename=file)
             else:
-                return blob.upload_from_file(file_obj=file)
+                # i witnessed an issue that when i set the service acount json , blob.upload_from_file(file_obj=file) returns none instead of the metadata
+                request_object = self.requests.post(request_ref, data=file_object)
+                raise_detailed_error(request_object)
+                return request_object.json() # this returns the metadata
+#                 return blob.upload_from_file(file_obj=file)
         else:
             request_object = self.requests.post(request_ref, data=file_object)
             raise_detailed_error(request_object)
