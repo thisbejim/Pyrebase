@@ -5,3 +5,7 @@ requests-toolbelt==0.9.1
 python-jwt==3.3.4
 pycryptodome==3.10.1
 urllib3>=1.26.5 # not directly required, pinned by Snyk to avoid a vulnerability
+certifi>=2023.7.22 # not directly required, pinned by Snyk to avoid a vulnerability
+cryptography>=41.0.4 # not directly required, pinned by Snyk to avoid a vulnerability
+grpcio>=1.53.2 # not directly required, pinned by Snyk to avoid a vulnerability
+jwcrypto>=1.4 # not directly required, pinned by Snyk to avoid a vulnerability
