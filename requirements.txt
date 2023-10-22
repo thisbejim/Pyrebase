@@ -1,6 +1,11 @@
-requests==2.11.1
-gcloud==0.17.0
-oauth2client==3.0.0
-requests-toolbelt==0.7.0
-python-jwt==2.0.1
-pycrypto==2.6.1
+requests==2.20
+gcloud==0.18.3
+oauth2client==4.1.3
+requests-toolbelt==0.9.1
+python-jwt==3.3.4
+pycryptodome==3.10.1
+urllib3>=1.26.5 # not directly required, pinned by Snyk to avoid a vulnerability
+certifi>=2023.7.22 # not directly required, pinned by Snyk to avoid a vulnerability
+cryptography>=41.0.4 # not directly required, pinned by Snyk to avoid a vulnerability
+grpcio>=1.53.2 # not directly required, pinned by Snyk to avoid a vulnerability
+jwcrypto>=1.4 # not directly required, pinned by Snyk to avoid a vulnerability
